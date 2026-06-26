@@ -1,0 +1,10 @@
+{
+  "name": "agent-3md",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "One 3md file as an entire agent: plane 0 is the agent, every other plane is a skill, queried and fetched on demand.",
+  "scripts": {
+    "demo": "bun run src/demo.ts"
+  }
+}
