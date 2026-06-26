@@ -551,7 +551,7 @@ fn main() {
             }
             let ok = errors.is_empty();
             println!(
-                "  {} — {} error(s), {} warning(s)",
+                "  {} - {} error(s), {} warning(s)",
                 if ok { "PASS" } else { "FAIL" },
                 errors.len(),
                 warnings.len()

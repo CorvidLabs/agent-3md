@@ -20,6 +20,10 @@ on:
       - "**/*.png"
   workflow_dispatch:
 
+# The gates only read the repo; never grant write to GITHUB_TOKEN.
+permissions:
+  contents: read
+
 jobs:
   trust:
     # macOS so the verify lane can build the Swift loader alongside TS and Rust.
