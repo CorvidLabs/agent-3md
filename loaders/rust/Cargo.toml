@@ -2,7 +2,11 @@
 name = "agent3md-loader"
 version = "0.1.0"
 edition = "2021"
-description = "Reference agent.3md loader in Rust, proving the standard is cross-language."
+description = "agent3md - a native CLI over any agent.3md file, on the canonical threemd parser."
+
+[[bin]]
+name = "agent3md"
+path = "src/main.rs"
 
 [dependencies]
 threemd = { path = "../../../3md/rust" }
