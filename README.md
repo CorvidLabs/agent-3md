@@ -31,13 +31,10 @@ the package you embed in an agent; it carries the spec, the validator, and the
 MCP server. **Rust is the default native CLI**, a single fast binary for the
 command line with no runtime to install.
 
-**Embed the library (TypeScript, the default for code).** It's on GitHub
-Packages. That registry needs a token even for public packages, so create a
-classic personal access token with the `read:packages` scope, then point the
-`@corvidlabs` scope at the registry and install:
+**Embed the library (TypeScript, the default for code).** It's on the public
+npm registry, no token or `.npmrc` needed:
 
 ```sh
-printf '@corvidlabs:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT\n' > .npmrc
 npm install @corvidlabs/agent3md
 ```
 

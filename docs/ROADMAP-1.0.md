@@ -51,13 +51,21 @@ taking them on faith. This doc records what they found, what is fixed, and what
   the default for the command line. TypeScript stays the reference library that
   carries the spec, validator, and MCP server.
 - **Typed inputs and per-skill tool bindings** (additive): a skill declares
-  typed inputs (`name:type?`, a closed type set) and the concrete tool it drives
-  (`tool="db.query"`). Parsed and validated identically in the TypeScript, Rust,
-  and Swift loaders, with new conformance vectors. The old untyped form stays
-  valid, so this does not break `agent3md/1`.
+  typed inputs (`name:type?`, a closed type set) and the command it drives
+  (`tool="rg ... {pattern}"`). Parsed and validated identically in the
+  TypeScript, Rust, and Swift loaders, with new conformance vectors. The old
+  untyped form stays valid, so this does not break `agent3md/1`.
+- **CLI-backed skills**: `tool` is a runnable command template whose
+  placeholders are the typed inputs; the loop is route -> fill -> run, with
+  `agent3md run [--exec]`. A `tool` is optional, so guidance-only skills (web
+  search, judgment calls) are first-class too.
+- **Frictionless install**: published to the public npm registry, so
+  `npm install @corvidlabs/agent3md` needs no token or `.npmrc`. The release
+  workflow publishes with provenance via npm Trusted Publishers (OIDC).
+- **Hosted docs**: full documentation at corvidlabs.xyz/agent-3md/docs/.
 
 ## Still needed for 1.0.0
 
-- A cleaner install path (public npm registry, or keep GitHub Packages but make
-  the token step truly one command). Blocked on CorvidLabs npm org access.
+- Real external adopters. Until then this is a proposed format, not a standard,
+  so the package stays on the 0.x line.
 - Real external adopters. Until then this is a proposed format, not a standard.
