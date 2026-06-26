@@ -1,0 +1,14 @@
+---
+3md: 1.0
+title: Entry
+agent: entry
+model: claude-opus-4-8
+entry: "0"
+---
+@plane z=0 label="Entry" kind=identity
+# Entry
+The entry frontmatter points at a real plane (the identity, z=0).
+
+@plane z=1 label="greet" kind=skill triggers="hi, hello, greet"
+# Skill: greet
+Greet the user.

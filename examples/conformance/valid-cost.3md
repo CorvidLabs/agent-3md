@@ -1,0 +1,18 @@
+---
+3md: 1.0
+title: Cost
+agent: cost
+model: claude-opus-4-8
+tools: db, net
+---
+@plane z=0 label="Cost" kind=identity
+# Cost
+Skills carry optional cost tags an orchestrator can budget against.
+
+@plane z=1 label="query" kind=skill triggers="sql, query, rows" inputs="question" cost="db"
+# Skill: query
+Run a read-only SELECT.
+
+@plane z=2 label="search" kind=skill triggers="search, web, lookup" inputs="q" cost="net"
+# Skill: search
+Search the open web.

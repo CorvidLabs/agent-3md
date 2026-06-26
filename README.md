@@ -13,12 +13,16 @@ instead of stuffing every skill into context.
 ## Why it's good for agents
 
 - **Progressive disclosure.** At 100 skills, loading only the routed skill uses
-  **~83% fewer tokens/turn (1420 vs 8300)**, and the gap widens with every skill
-  added (`bun run scale`).
+  **~83% fewer tokens/turn (1420 vs 8300)** (`bun run scale`). And with the
+  catalog queried out-of-context (route as a tool), per-turn cost goes **flat**:
+  **~94 tokens whether the agent has 10 skills or 100** (`bun run scale2`) — so
+  one agent file can hold thousands of skills with no per-turn context growth.
 - **One artifact, two readers.** Read it as docs; parse it as an index.
-- **Portable.** The 3md parser exists in Swift, TypeScript, and Rust, so the
-  same agent file loads anywhere.
-- **Checkable.** A conformance validator makes it a real standard, not a vibe.
+- **Portable, proven.** The same `agent.3md` loads and routes identically in
+  **TypeScript, Rust, and Swift** (`loaders/`), each on the canonical 3md parser.
+  Plus a JSON projection (`bun run export`) for non-3md consumers.
+- **Checkable.** A conformance validator + a language-agnostic vector set
+  (`examples/conformance/`) make it a real standard, not a vibe.
 
 ## The standard
 
@@ -38,7 +42,11 @@ dependency links), the loader contract (`manifest` / `route` / `get` /
 | `src/validate.ts` | conformance validator (+ `examples/invalid/` fixtures) |
 | `src/cli.ts` | `agent3md` CLI |
 | `src/mcp.ts` | MCP server: exposes an agent's skills as MCP tools |
-| `src/benchmark.ts`, `src/scale/` | token-savings proof, single + scaled |
+| `src/export.ts` | JSON manifest projection (`agent3md/1`) for any consumer |
+| `loaders/rust`, `loaders/swift` | the same agent loaded via the Rust + Swift parsers |
+| `examples/agents/` | more agents (devops, support) — proves generality |
+| `examples/conformance/` | labeled valid/invalid vectors for any implementation |
+| `src/benchmark.ts`, `src/scale/` | token-savings proof, single + scaled + flat |
 
 ## Try it
 
@@ -64,6 +72,7 @@ Point an MCP-capable agent at the server; its skills appear as tools
 
 ## Status
 
-v1 reference kit (TypeScript). Roadmap: loaders in Swift/Rust (the parser already
-exists there), a JSON manifest projection, typed skill inputs, and tool bindings
-so a skill body can declare the tool it drives. See `SPEC.md` §future.
+v1 standard kit: spec, reference loader (TS) plus **Rust and Swift loaders**, a
+validator + conformance vectors, CLI, MCP server, JSON projection, and flat
+scaling. Roadmap: typed skill inputs and tool bindings so a skill body can
+declare the tool it drives, plus publishing the spec. See `SPEC.md` §future.

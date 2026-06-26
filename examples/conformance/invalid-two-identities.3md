@@ -1,0 +1,12 @@
+---
+3md: 1.0
+title: TwoIdentities
+model: claude-opus-4-8
+---
+@plane z=0 label="one" kind=identity
+# one
+First identity.
+
+@plane z=1 label="two" kind=identity
+# two
+Second identity plane. RULE: identity (expected exactly one).

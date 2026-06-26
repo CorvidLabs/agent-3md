@@ -1,0 +1,12 @@
+---
+3md: 1.0
+title: DeadLink
+model: claude-opus-4-8
+---
+@plane z=0 label="DeadLink" kind=identity
+# DeadLink
+Identity.
+
+@plane z=1 label="skill" kind=skill triggers="go"
+# Skill: skill
+This links to [[z=42|nowhere]]. RULE: dead-link.

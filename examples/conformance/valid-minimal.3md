@@ -1,0 +1,12 @@
+---
+3md: 1.0
+title: Min
+model: claude-haiku-4-5
+---
+@plane z=0 label="Min" kind=identity
+# Min
+The smallest conforming agent: required frontmatter, one identity plane, one skill.
+
+@plane z=1 label="echo" kind=skill triggers="echo, repeat, say"
+# Skill: echo
+Repeat the input back to the user.

@@ -1,0 +1,16 @@
+---
+3md: 1.0
+title: DupSkill
+model: claude-opus-4-8
+---
+@plane z=0 label="DupSkill" kind=identity
+# DupSkill
+Identity.
+
+@plane z=1 label="dup" kind=skill triggers="x"
+# Skill: dup
+First.
+
+@plane z=2 label="dup" kind=skill triggers="y"
+# Skill: dup
+Duplicate label. RULE: unique-skill.

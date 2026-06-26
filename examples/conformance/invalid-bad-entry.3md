@@ -1,0 +1,13 @@
+---
+3md: 1.0
+title: BadEntry
+model: claude-opus-4-8
+entry: "7"
+---
+@plane z=0 label="BadEntry" kind=identity
+# BadEntry
+entry points at z=7, which does not exist. RULE: entry.
+
+@plane z=1 label="skill" kind=skill triggers="go"
+# Skill: skill
+A skill.

@@ -3,17 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "The agent.3md standard: one 3md file is a whole agent (identity + on-demand skills), with a loader, validator, CLI, and MCP server.",
+  "description": "The agent.3md standard: one 3md file is a whole agent (identity + on-demand skills), with loaders in TS/Rust/Swift, a validator, CLI, MCP server, and JSON projection.",
   "scripts": {
     "demo": "bun run src/demo.ts",
     "run": "bun run src/run.ts",
     "benchmark": "bun run src/benchmark.ts",
+    "scale": "bun run src/scale/scale-bench.ts",
+    "scale2": "bun run src/scale/scale-bench2.ts",
     "validate": "bun run src/validate.ts",
     "test": "bun test",
     "cli": "bun run src/cli.ts",
+    "export": "bun run src/export.ts",
     "mcp": "bun run src/mcp.ts",
     "mcp:selftest": "bun run src/mcp-selftest.ts",
     "gen:agents": "bun run src/scale/gen-big-agent.ts",
-    "scale": "bun run src/scale/scale-bench.ts"
+    "loaders:rust": "cd loaders/rust && cargo run -q",
+    "loaders:swift": "cd loaders/swift && swift run"
   }
 }

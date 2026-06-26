@@ -1,3 +1,6 @@
 node_modules
 *.log
 .DS_Store
+loaders/rust/target
+loaders/swift/.build
+src/scale/agent-*.3md

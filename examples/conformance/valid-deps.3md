@@ -1,0 +1,17 @@
+---
+3md: 1.0
+title: Deps
+agent: deps
+model: claude-opus-4-8
+---
+@plane z=0 label="Deps" kind=identity
+# Deps
+Demonstrates skill dependencies via cross-plane links.
+
+@plane z=1 label="answer" kind=skill triggers="answer, ask, question"
+# Skill: answer
+Answer a question, then attach sources with [[z=2|cite]].
+
+@plane z=2 label="cite" kind=skill triggers="cite, source, reference"
+# Skill: cite
+Attach a verifiable source to each claim.

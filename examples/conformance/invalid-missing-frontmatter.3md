@@ -1,0 +1,11 @@
+---
+3md: 1.0
+title: MissingModel
+---
+@plane z=0 label="MissingModel" kind=identity
+# MissingModel
+No model: frontmatter. RULE: frontmatter.
+
+@plane z=1 label="skill" kind=skill triggers="go"
+# Skill: skill
+A skill.

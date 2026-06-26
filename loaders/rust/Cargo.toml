@@ -1,0 +1,8 @@
+[package]
+name = "agent3md-loader"
+version = "0.1.0"
+edition = "2021"
+description = "Reference agent.3md loader in Rust, proving the standard is cross-language."
+
+[dependencies]
+threemd = { path = "../../../3md/rust" }
