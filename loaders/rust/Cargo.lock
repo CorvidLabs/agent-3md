@@ -12,3 +12,5 @@ dependencies = [
 [[package]]
 name = "threemd"
 version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18e4fb1f35ba19914595f874949b9efeb1343f1761120a7839298d620c0ef56f"

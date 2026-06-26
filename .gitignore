@@ -5,4 +5,3 @@ loaders/rust/target
 loaders/swift/.build
 src/scale/agent-*.3md
 dist
-loaders/vendor/threemd/target

@@ -9,4 +9,4 @@ name = "agent3md"
 path = "src/main.rs"
 
 [dependencies]
-threemd = { path = "../vendor/threemd" }
+threemd = "1.0"

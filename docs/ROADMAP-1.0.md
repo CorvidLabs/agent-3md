@@ -43,9 +43,6 @@ taking them on faith. This doc records what they found, what is fixed, and what
 
 ## Still needed for 1.0.0
 
-- Publish the `threemd` Rust crate to crates.io so the Rust loader drops its
-  vendored copy (the one remaining "not fully standalone" caveat) and parser
-  drift is impossible.
 - A cleaner install path (public npm registry, or keep GitHub Packages but make
   the token step truly one command).
 - Parser-level hardening upstream in `CorvidLabs/3md` (allocate parsed
