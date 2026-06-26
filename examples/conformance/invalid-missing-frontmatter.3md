@@ -1,10 +1,10 @@
 ---
 3md: 1.0
-title: MissingModel
 ---
-@plane z=0 label="MissingModel" kind=identity
-# MissingModel
-No model: frontmatter. RULE: frontmatter.
+@plane z=0 label="Nameless" kind=identity
+# Nameless
+No `title:` or `agent:` to name the agent (a plane label is not the agent name).
+RULE: frontmatter.
 
 @plane z=1 label="skill" kind=skill triggers="go"
 # Skill: skill

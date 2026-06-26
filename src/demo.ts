@@ -19,11 +19,12 @@ console.log(`  skills: ${man.skills.length}  ->  ${man.skills.map((s) => s.name)
 console.log("=".repeat(64));
 
 const requests = [
-  "find me the latest research on tokamak fusion",
-  "pull the tables out of this scanned pdf",
-  "what rows in the orders table have a null total?",
-  "give me a tldr of this article",
-  "review my diff for bugs before I open the PR",
+  "find every TODO in src",
+  "list all test files under src",
+  "parse the version field from package.json",
+  "show the recent commits for the runtime",
+  "show the open prs",
+  "download the file from this http url",
 ];
 
 console.log("\nROUTING (free text -> skill, by trigger index):\n");
@@ -44,11 +45,19 @@ for (const r of requests) {
 
 console.log("\nINSTANT FETCH of one skill body (progressive disclosure):\n");
 const t1 = performance.now();
-const sql = agent.get("sql-query");
+const search = agent.get("search");
 const us1 = ((performance.now() - t1) * 1000).toFixed(0);
-console.log(`  get("sql-query") in ${us1}us -> ${sql!.body.split("\n").length} lines, inputs=[${sql!.inputs.join(", ")}], cost=${sql!.cost}`);
+console.log(`  get("search") in ${us1}us -> ${search!.body.split("\n").length} lines, binary=${search!.binary}, inputs=[${search!.inputs.join(", ")}], tool=${search!.tool}`);
 console.log("  --- first lines of that skill (the only plane an agent would load) ---");
-console.log(sql!.body.split("\n").slice(0, 4).map((l) => "    " + l).join("\n"));
+console.log(search!.body.split("\n").slice(0, 4).map((l) => "    " + l).join("\n"));
+
+console.log("\nROUTE -> FILL -> COMMAND (a request becomes a runnable command):\n");
+const ask = "find every TODO in src";
+const picked = agent.route(ask)[0].skill;
+const command = agent.command(picked.name, { pattern: "TODO", path: "src" });
+console.log(`  "${ask}"`);
+console.log(`     -> ${picked.name}  (template: ${picked.tool})`);
+console.log(`     -> ${command}`);
 
 console.log("\nJSON the agent can query (skill catalog, no bodies):");
 console.log(JSON.stringify(man.skills, null, 0));

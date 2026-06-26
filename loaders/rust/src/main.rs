@@ -75,6 +75,76 @@ fn parse_inputs(v: Option<&String>) -> Vec<SkillInput> {
         .collect()
 }
 
+/// Placeholder names referenced by a `{name}` command template, in order. One
+/// grammar, shared with the TS loader: `[A-Za-z_]\w*` inside `{ }`.
+fn command_placeholders(template: &str) -> Vec<String> {
+    let b = template.as_bytes();
+    let mut out = Vec::new();
+    let mut i = 0;
+    while i < b.len() {
+        if b[i] == b'{' {
+            let start = i + 1;
+            let mut j = start;
+            while j < b.len() && b[j] != b'}' {
+                j += 1;
+            }
+            if j < b.len() && j > start {
+                let name = &template[start..j];
+                let mut chars = name.chars();
+                let ok = chars
+                    .next()
+                    .map(|c| c.is_ascii_alphabetic() || c == '_')
+                    .unwrap_or(false)
+                    && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_');
+                if ok {
+                    out.push(name.to_string());
+                }
+                i = j + 1;
+                continue;
+            }
+        }
+        i += 1;
+    }
+    out
+}
+
+/// Fill a `{name}` command template from `values` (shell-quoted). Unprovided
+/// placeholders are left visible. Mirrors the TS and Swift loaders.
+fn fill_command(template: &str, values: &BTreeMap<String, String>) -> String {
+    let mut out = String::new();
+    let mut rest = template;
+    while let Some(open) = rest.find('{') {
+        if let Some(rel_close) = rest[open + 1..].find('}') {
+            let close = open + 1 + rel_close;
+            let name = &rest[open + 1..close];
+            let valid = !name.is_empty()
+                && name
+                    .bytes()
+                    .next()
+                    .map(|b| b.is_ascii_alphabetic() || b == b'_')
+                    .unwrap_or(false)
+                && name.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_');
+            if valid {
+                out.push_str(&rest[..open]);
+                match values.get(name) {
+                    Some(v) => {
+                        out.push('\'');
+                        out.push_str(&v.replace('\'', "'\\''"));
+                        out.push('\'');
+                    }
+                    None => out.push_str(&rest[open..=close]),
+                }
+                rest = &rest[close + 1..];
+                continue;
+            }
+        }
+        out.push_str(&rest[..=open]);
+        rest = &rest[open + 1..];
+    }
+    out.push_str(rest);
+    out
+}
+
 /// Pull dependency targets out of a plane body. One grammar, shared with the TS
 /// runtime, validator, and spec: `[[z=N]]` or `[[z=N|label]]` (closing required).
 fn parse_deps(body: &str) -> Vec<i64> {
@@ -265,13 +335,7 @@ fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
     if doc.version.trim().is_empty() {
         err("frontmatter", "missing `3md:` version line".into(), None);
     }
-    if !doc.metadata.contains_key("model") {
-        err(
-            "frontmatter",
-            "missing required `model:` frontmatter".into(),
-            None,
-        );
-    }
+    // `model` is an optional hint the host may override, so it is not required.
     if doc.title.is_none() && !doc.metadata.contains_key("agent") {
         err(
             "frontmatter",
@@ -422,10 +486,55 @@ fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
             }
         }
         if let Some(tool) = p.attributes.get("tool") {
-            if tool.trim().is_empty() {
+            let t = tool.trim();
+            if t.is_empty() {
                 warnings.push(Issue {
                     rule: "tool",
                     msg: format!("skill \"{name}\" has an empty tool binding"),
+                    z: Some(z),
+                });
+            } else {
+                // every {placeholder} must be a declared input; an input the
+                // command never uses is a likely mistake (warning).
+                let mut used: BTreeSet<String> = BTreeSet::new();
+                for ph in command_placeholders(t) {
+                    used.insert(ph.clone());
+                    if !seen.contains(&ph) {
+                        err(
+                            "tool-input",
+                            format!("skill \"{name}\" command references {{{ph}}}, which is not a declared input"),
+                            Some(z),
+                        );
+                    }
+                }
+                for n in &seen {
+                    if !used.contains(n) {
+                        warnings.push(Issue {
+                            rule: "unused-input",
+                            msg: format!("skill \"{name}\" declares input \"{n}\" that its command never uses"),
+                            z: Some(z),
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    // honest manifest: a skill's binary SHOULD appear in frontmatter `tools`.
+    let declared_tools: BTreeSet<String> = csv(doc.metadata.get("tools")).into_iter().collect();
+    if !declared_tools.is_empty() {
+        for p in doc.planes.iter().filter(is_skill) {
+            let z = p.z as i64;
+            let tool = p.attributes.get("tool").map(|s| s.trim()).unwrap_or("");
+            if tool.is_empty() {
+                continue;
+            }
+            let binary = tool.split_whitespace().next().unwrap_or("");
+            if !declared_tools.contains(binary) {
+                let name = p.label.clone().unwrap_or_else(|| format!("skill-{z}"));
+                warnings.push(Issue {
+                    rule: "undeclared-tool",
+                    msg: format!("skill \"{name}\" runs \"{binary}\", which is not in the agent's tools list"),
                     z: Some(z),
                 });
             }
@@ -446,12 +555,16 @@ commands:
   route    <file> <text>     rank skills matching the request + the load chain
   get      <file> <skill>    print one skill's body (progressive disclosure)
   resolve  <file> <skill>    a skill plus its transitive dependency chain
+  run      <file> <text> [k=v ...] [--exec]
+                             route, fill the skill's command from k=v, print it;
+                             --exec runs it
   validate <file>            check the file against agent3md/1 (exit 1 on errors)
 
 examples:
   agent3md manifest agent.3md
-  agent3md route agent.3md \"review my diff\"
-  agent3md get agent.3md sql-query
+  agent3md route agent.3md \"find every TODO\"
+  agent3md get agent.3md search
+  agent3md run agent.3md \"find every TODO\" pattern=TODO path=src
   agent3md validate agent.3md";
 
 fn fail(msg: &str) -> ! {
@@ -535,7 +648,7 @@ fn main() {
             let text = rest.join(" ");
             let text = text.trim();
             if text.is_empty() {
-                fail("route needs a request, e.g. route agent.3md \"summarize this\"");
+                fail("route needs a request, e.g. route agent.3md \"find every TODO\"");
             }
             let (_doc, skills) = load(&file);
             let ranked = route(&skills, text);
@@ -567,7 +680,7 @@ fn main() {
             let name = rest.join(" ");
             let name = name.trim();
             if name.is_empty() {
-                fail("get needs a skill name, e.g. get agent.3md sql-query");
+                fail("get needs a skill name, e.g. get agent.3md search");
             }
             let (_doc, skills) = load(&file);
             match get(&skills, name) {
@@ -609,7 +722,7 @@ fn main() {
             let name = rest.join(" ");
             let name = name.trim();
             if name.is_empty() {
-                fail("resolve needs a skill name, e.g. resolve agent.3md web-research");
+                fail("resolve needs a skill name, e.g. resolve agent.3md search");
             }
             let (_doc, skills) = load(&file);
             if get(&skills, name).is_none() {
@@ -631,6 +744,98 @@ fn main() {
                     )
                 };
                 println!("  - {}{}", s.name, deps);
+            }
+        }
+        "run" => {
+            let mut exec = false;
+            let mut values: BTreeMap<String, String> = BTreeMap::new();
+            let mut words: Vec<&str> = Vec::new();
+            for a in rest {
+                if a == "--exec" {
+                    exec = true;
+                    continue;
+                }
+                if let Some(eq) = a.find('=') {
+                    let key = &a[..eq];
+                    let is_ident = !key.is_empty()
+                        && key
+                            .bytes()
+                            .next()
+                            .map(|b| b.is_ascii_alphabetic() || b == b'_')
+                            .unwrap_or(false)
+                        && key.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_');
+                    if is_ident {
+                        values.insert(key.to_string(), a[eq + 1..].to_string());
+                        continue;
+                    }
+                }
+                words.push(a);
+            }
+            let text = words.join(" ");
+            let text = text.trim();
+            if text.is_empty() {
+                fail("run needs a request, e.g. run agent.3md \"find every TODO\" pattern=TODO path=src");
+            }
+            let (_doc, skills) = load(&file);
+            let ranked = route(&skills, text);
+            if ranked.is_empty() {
+                println!("no skill matched: \"{text}\"");
+                return;
+            }
+            let top = ranked[0].0;
+            println!("request: \"{text}\"");
+            println!("  -> {}  (matched: {})", top.name, ranked[0].1.join(", "));
+            let chain = resolve(&skills, &top.name);
+            if chain.len() > 1 {
+                println!(
+                    "  loads: {}",
+                    chain
+                        .iter()
+                        .map(|s| s.name.as_str())
+                        .collect::<Vec<_>>()
+                        .join(" + ")
+                );
+            }
+            match &top.tool {
+                None => {
+                    println!("  (no command bound; this skill is guidance only)");
+                    println!("{}", top.body);
+                }
+                Some(tool) => {
+                    let missing: Vec<String> = command_placeholders(tool)
+                        .into_iter()
+                        .filter(|p| !values.contains_key(p))
+                        .collect();
+                    let command = fill_command(tool, &values);
+                    println!("  command: {command}");
+                    if !missing.is_empty() {
+                        println!(
+                            "  fill:    {}",
+                            missing
+                                .iter()
+                                .map(|m| format!("{m}="))
+                                .collect::<Vec<_>>()
+                                .join(" ")
+                        );
+                    }
+                    if exec {
+                        if !missing.is_empty() {
+                            fail(&format!(
+                                "cannot --exec: missing values for {}",
+                                missing.join(", ")
+                            ));
+                        }
+                        println!("  --- exec ---");
+                        match std::process::Command::new("sh")
+                            .arg("-c")
+                            .arg(&command)
+                            .status()
+                        {
+                            Ok(s) => exit(s.code().unwrap_or(1)),
+                            Err(e) => fail(&format!("exec failed: {e}")),
+                        }
+                    }
+                }
             }
         }
         "validate" => {

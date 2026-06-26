@@ -57,6 +57,28 @@ private func parseInputs(_ value: String?) -> [SkillInput] {
     }
 }
 
+// Fill a `tool=` command template's `{input}` placeholders from `values`
+// (shell-quoted). Unprovided placeholders are left visible. One grammar, shared
+// with the TS and Rust loaders.
+private func fillCommand(_ template: String, _ values: [String: String]) -> String {
+    guard let re = try? NSRegularExpression(pattern: "\\{([a-zA-Z_]\\w*)\\}") else { return template }
+    let ns = template as NSString
+    var out = ""
+    var last = 0
+    for m in re.matches(in: template, range: NSRange(location: 0, length: ns.length)) {
+        out += ns.substring(with: NSRange(location: last, length: m.range.location - last))
+        let name = ns.substring(with: m.range(at: 1))
+        if let v = values[name] {
+            out += "'" + v.replacingOccurrences(of: "'", with: "'\\''") + "'"
+        } else {
+            out += ns.substring(with: m.range)
+        }
+        last = m.range.location + m.range.length
+    }
+    out += ns.substring(from: last)
+    return out
+}
+
 // Dependency links: `[[z=N]]` or `[[z=N|label]]`. One grammar, shared with the
 // TS runtime, the validator, the spec, and the Rust loader.
 private func depLinks(in body: String) -> [Int] {
@@ -184,24 +206,26 @@ let agent = try Agent(source: source)
 print(String(repeating: "=", count: 60))
 print("MANIFEST (Swift loader)")
 print("  name:   \(agent.name)")
-print("  model:  \(agent.model)")
+if agent.model != "unknown" { print("  model:  \(agent.model)") }
 print("  tools:  \(agent.tools.joined(separator: ", "))")
 print("  skills: \(agent.skills.count) -> \(agent.skills.map(\.name).joined(separator: ", "))")
 print(String(repeating: "=", count: 60))
 
-let request = "review my diff before the PR"
+let request = "find every TODO in the source"
 print("\nroute(\"\(request)\"):")
 if let top = agent.route(request).first {
     print("  -> \(top.skill.name)  (matched: \(top.hits.joined(separator: ", ")))")
-    let chain = agent.resolve(top.skill.name).map(\.name).joined(separator: " + ")
-    print("  loads: \(chain)")
+    if let tool = top.skill.tool {
+        let cmd = fillCommand(tool, ["pattern": "TODO", "path": "src"])
+        print("  command: \(cmd)")
+    }
 }
 
-print("\nget(\"sql-query\") (progressive disclosure, first 4 lines):")
-if let sql = agent.get("sql-query") {
-    let typed = sql.inputSchema.map { "\($0.name):\($0.type)\($0.required ? "" : "?")" }.joined(separator: ", ")
-    print("    tool=\(sql.tool ?? "(none)"), inputs=\(typed)")
-    for line in sql.body.split(separator: "\n", omittingEmptySubsequences: false).prefix(4) {
+print("\nget(\"search\") (progressive disclosure, first 4 lines):")
+if let search = agent.get("search") {
+    let typed = search.inputSchema.map { "\($0.name):\($0.type)\($0.required ? "" : "?")" }.joined(separator: ", ")
+    print("    tool=\(search.tool ?? "(none)"), inputs=\(typed)")
+    for line in search.body.split(separator: "\n", omittingEmptySubsequences: false).prefix(4) {
         print("    \(line)")
     }
 }

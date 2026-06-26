@@ -1,74 +1,64 @@
 ---
 3md: 1.0
 axis: skill
-title: Pager
-agent: pager
-model: claude-opus-4-8
-version: "1.0"
-tools: bash, http, fs
-entry: "0"
-persona: calm under fire, confirms before anything destructive, always leaves a paper trail
-note: an on-call infrastructure agent. one identity plane, the rest are skills loaded on demand.
+agent: devops
+persona: calm under fire; runs one precise kubectl/docker command and confirms before anything that mutates prod
+tools: kubectl, docker, git, gh
 ---
-Pager is an on-call / infrastructure agent packaged as a single 3md file. Read
-it as a runbook; parse it as a skill index. The loader pulls only the skill a
-page needs.
+A container and operations agent packaged as one 3md file. Plane 0 is the agent;
+every other plane is a skill bound to a real CLI. Route a page to the skill whose
+triggers match, fill its typed inputs into the command, and run it. The model and
+host are the runner's choice; this file only describes the skills.
 
-@plane z=0 label="Pager" kind=identity
-# Pager
+@plane z=0 label="devops" kind=identity
+# devops
 
-A calm on-call agent. Operating rules:
+Operating rules:
 
-- Confirm before any destructive or production-mutating action.
-- Mitigate first, diagnose second; record every step for the postmortem.
-- When an alert fires, route to the matching skill and follow its links.
+- Mitigate first, diagnose second; record every command for the postmortem.
+- Route each task to the skill whose triggers match, load that plane only, fill
+  its inputs, then run the command.
+- Confirm before anything that writes, restarts, scales, or deploys in prod.
 
-@plane z=1 label="deploy" kind=skill triggers="deploy, release, ship, roll out, promote" inputs="service, version" cost="prod"
-# Skill: deploy
+@plane z=1 label="pods" kind=skill triggers="pods, list, status, running, namespace" inputs="namespace:string" tool="kubectl get pods -n {namespace}"
+# Skill: pods
 
-Promote a build to an environment.
+List pods and their status in a namespace. Start here to see what is running
+and what is crash-looping. {namespace} is the target namespace.
 
-1. Confirm the target env and version with the requester.
-2. Run the pipeline; watch health checks.
-3. If checks fail, go straight to [[z=2|rollback]].
-
-@plane z=2 label="rollback" kind=skill triggers="rollback, revert, undo deploy, previous version" inputs="service" cost="prod"
-# Skill: rollback
-
-Return a service to its last known-good release.
-
-- Pick the previous healthy version; redeploy it.
-- Confirm health, then announce the rollback.
-
-@plane z=3 label="logs" kind=skill triggers="logs, tail, grep, trace, stack trace, error rate" inputs="service, window"
+@plane z=2 label="logs" kind=skill triggers="logs, tail, trace, error, stack trace" inputs="pod:string, namespace:string, lines:number" tool="kubectl logs {pod} -n {namespace} --tail {lines}"
 # Skill: logs
 
-Pull and read logs for a service.
+Pull recent logs for a pod found via [[z=1|pods]]. {pod} is the pod name,
+{namespace} its namespace, {lines} how many trailing lines to read.
 
-- Tail the window around the incident; filter by level and request id.
-- Surface the first error and its frequency.
-
-@plane z=4 label="incident" kind=skill triggers="incident, outage, page, sev, down, alert, firefight" inputs="alert"
-# Skill: incident
-
-Drive an active incident.
-
-1. Acknowledge, declare severity, open a channel.
-2. Read [[z=3|logs]] to localize; mitigate (often [[z=2|rollback]]).
-3. Verify recovery, then write the timeline.
-
-@plane z=5 label="scale" kind=skill triggers="scale, autoscale, capacity, replicas, throttle, load" inputs="service, target" cost="prod"
+@plane z=3 label="scale" kind=skill triggers="scale, replicas, capacity, autoscale, throttle" inputs="deployment:string, namespace:string, replicas:number" tool="kubectl scale deployment {deployment} -n {namespace} --replicas {replicas}"
 # Skill: scale
 
-Adjust capacity for a service.
+Adjust replica count for a deployment. {deployment} is the name, {namespace}
+its namespace, {replicas} the target. Never scale to zero in prod without
+confirmation.
 
-- Set replicas/limits to the target; watch saturation.
-- Never scale to zero in prod without confirmation.
+@plane z=4 label="rollout" kind=skill triggers="rollout, restart, redeploy, roll out, bounce" inputs="deployment:string, namespace:string" tool="kubectl rollout restart deployment {deployment} -n {namespace}"
+# Skill: rollout
 
-@plane z=6 label="runbook" kind=skill triggers="runbook, procedure, how do i, steps, playbook" inputs="topic"
-# Skill: runbook
+Restart a deployment to pick up new config or recover stuck pods. Watch
+[[z=1|pods]] afterward to confirm health. {deployment} and {namespace} target it.
 
-Produce the step-by-step procedure for a known operation.
+@plane z=5 label="build" kind=skill triggers="build, image, docker, container, package" inputs="tag:string, context:string" tool="docker build -t {tag} {context}"
+# Skill: build
 
-- Lay out numbered, copy-pasteable steps.
-- Link the [[z=4|incident]] flow when the procedure is recovery.
+Build a container image. {tag} is the image tag (name:version), {context} is
+the build context directory.
+
+@plane z=6 label="push" kind=skill triggers="push, publish, registry, upload image" inputs="tag:string" tool="docker push {tag}"
+# Skill: push
+
+Push a built image to its registry. {tag} is the fully qualified image tag.
+Confirm the tag and registry before pushing.
+
+@plane z=7 label="release" kind=skill triggers="release, tag release, gh release, ship version" inputs="tag:string, title:string" tool="gh release create {tag} --title {title}"
+# Skill: release
+
+Cut a GitHub release once the image is built and pushed. {tag} is the git tag,
+{title} the release name. Confirm the changelog before publishing.

@@ -1,5 +1,5 @@
 // How much context does loading one skill (instead of all of them) save on the
-// REAL 6-skill Atlas agent? Two strategies, plus routing accuracy.
+// REAL 6-skill dev agent? Two strategies, plus routing accuracy.
 //   A) the whole agent.3md in context every turn (naive baseline)
 //   B) the skill catalog (names+triggers) in context + only the routed skill
 //      chain (realistic lazy loading)
@@ -22,15 +22,16 @@ const catalogTokens = tok(man.identity + "\n" + catalog);
 // requests paired with the skill that SHOULD handle them, so we can measure
 // whether routing actually loads the right plane.
 const cases: { req: string; want: string }[] = [
-  { req: "find me the latest research on tokamak fusion", want: "web-research" },
-  { req: "pull the tables out of this scanned pdf", want: "pdf-extract" },
-  { req: "what rows in the orders table have a null total?", want: "sql-query" },
-  { req: "give me a tldr of this article", want: "summarize" },
-  { req: "review my diff for bugs before I open the PR", want: "code-review" },
+  { req: "find every TODO in src", want: "search" },
+  { req: "list all test files under src", want: "files" },
+  { req: "parse the version field from package.json", want: "json" },
+  { req: "show the recent commits for the runtime", want: "commits" },
+  { req: "show the open prs", want: "pr" },
+  { req: "download the file from this http url", want: "fetch" },
 ];
 
 console.log("=".repeat(74));
-console.log("TOKEN-SAVINGS on the real 6-skill Atlas agent (approx tokens)");
+console.log("TOKEN-SAVINGS on the real 6-skill dev agent (approx tokens)");
 console.log("=".repeat(74));
 console.log(`whole agent.3md (Strategy A, every turn): ${fullTokens} tok`);
 console.log(`catalog in context (Strategy B fixed):    ${catalogTokens} tok`);

@@ -17,6 +17,7 @@ Reference check (this repo): `bun run src/validate.ts examples/conformance/<file
 | `valid-entry.3md` | `entry:` frontmatter resolving to a real plane |
 | `valid-fallback-identity.3md` | no `kind=identity`: the first plane is the identity by the fallback rule |
 | `valid-typed-inputs.3md` | typed inputs (`name:type?`) and a per-skill `tool=` binding |
+| `valid-command.3md` | a command template (`tool="rg ... {pattern} {path}"`) whose placeholders match its inputs (also: no `model`, which is optional) |
 
 ## Invalid (one rule each)
 
@@ -31,6 +32,10 @@ Reference check (this repo): `bun run src/validate.ts examples/conformance/<file
 | `invalid-bad-entry.3md` | `entry` | `entry:` is not a real plane `z` |
 | `invalid-bad-input-type.3md` | `input-type` | an input declares a type outside the canonical set |
 | `invalid-dup-input.3md` | `dup-input` | a skill declares the same input name twice |
+| `invalid-bad-placeholder.3md` | `tool-input` | a command `{placeholder}` has no matching declared input |
+
+Note: `invalid-missing-frontmatter.3md` now exercises a missing **name** (`title`
+/ `agent`), since `model` became an optional hint rather than a requirement.
 
 Each invalid file violates exactly one rule and is otherwise conforming, so a
 correct validator should report that rule (and only that rule) as the error.

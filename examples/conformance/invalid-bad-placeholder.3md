@@ -1,0 +1,14 @@
+---
+3md: 1.0
+axis: skill
+agent: bad
+tools: rg
+---
+@plane z=0 label="bad" kind=identity
+# bad
+Identity.
+
+@plane z=1 label="search" kind=skill triggers="search" inputs="pattern:string" tool="rg {pattern} {path}"
+# Skill: search
+The command references {path}, which is not a declared input of this skill.
+RULE: tool-input.

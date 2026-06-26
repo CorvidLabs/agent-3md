@@ -10,8 +10,8 @@ const proc = Bun.spawn(["bun", mcpPath, agentPath], { stdin: "pipe", stdout: "pi
 const requests = [
   { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2024-11-05", capabilities: {} } },
   { jsonrpc: "2.0", id: 2, method: "tools/list" },
-  { jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "route_skill", arguments: { text: "review my diff before the PR" } } },
-  { jsonrpc: "2.0", id: 4, method: "tools/call", params: { name: "get_skill", arguments: { name: "sql-query" } } },
+  { jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "route_skill", arguments: { text: "find every TODO in src" } } },
+  { jsonrpc: "2.0", id: 4, method: "tools/call", params: { name: "get_skill", arguments: { name: "search" } } },
   { jsonrpc: "2.0", id: 5, method: "tools/call", params: { name: "list_skills" } },
 ];
 
@@ -49,8 +49,8 @@ console.log("MCP SELFTEST - client <-> server over stdio JSON-RPC");
 console.log("=".repeat(60));
 show(1, "initialize", (m) => `${m.result.serverInfo.name}  proto=${m.result.protocolVersion}`);
 show(2, "tools/list", (m) => m.result.tools.map((t: any) => `${t.name}(${Object.keys(t.inputSchema.properties).join(",")})`).join("\n"));
-show(3, "tools/call route_skill 'review my diff before the PR'", (m) => m.result.content[0].text);
-show(4, "tools/call get_skill 'sql-query'", (m) => m.result.content[0].text);
+show(3, "tools/call route_skill 'find every TODO in src'", (m) => m.result.content[0].text);
+show(4, "tools/call get_skill 'search'", (m) => m.result.content[0].text);
 show(5, "tools/call list_skills", (m) => m.result.content[0].text);
 
 console.log("\n--- robustness guards ---");

@@ -1,6 +1,6 @@
 ---
 module: runtime
-version: 2
+version: 3
 status: draft
 files:
   - src/runtime.ts
@@ -26,14 +26,15 @@ whole file into context.
 
 | Export | Description |
 |--------|-------------|
-| (none) | The module exports no standalone functions; behavior is on the `Agent` class. |
+| `fillCommand` | `fillCommand(template, values)`: fill a `{name}` command template from values, shell-quoting them; unprovided placeholders stay visible. |
+| `commandPlaceholders` | `commandPlaceholders(template)`: the placeholder names a command template references, de-duplicated. |
 
 ### Structs & Enums
 
 | Type | Description |
 |------|-------------|
-| `Agent` | Loads one agent.3md and answers manifest / route / get / resolve over its skills. |
-| `Skill` | One skill plane: `z`, `name`, `triggers`, `inputs` (names), `inputSchema` (typed), `tool`, `cost`, `deps`, `body`. |
+| `Agent` | Loads one agent.3md and answers manifest / route / get / resolve / command over its skills. |
+| `Skill` | One skill plane: `z`, `name`, `triggers`, `inputs` (names), `inputSchema` (typed), `tool` (command template), `binary` (first token of tool), `cost`, `deps`, `body`. |
 | `SkillInput` | A typed input: `name`, `type` (string/number/boolean/object/array), `required`. |
 | `AgentManifest` | The agent identity plus a light skill catalog with no skill bodies. |
 
@@ -52,6 +53,7 @@ whole file into context.
 | `Agent.get` | `get(nameOrZ: string \| number): Skill \| undefined` | O(1) fetch of one skill's full body by name or z. |
 | `Agent.route` | `route(text: string): { skill: Skill; score: number; hits: string[] }[]` | Rank skills whose trigger phrases the request satisfies; score is distinct phrases matched, ties broken by lower z. |
 | `Agent.resolve` | `resolve(nameOrZ: string \| number): Skill[]` | A skill plus everything it depends on via `[[z=N]]` links, transitively, in load order. |
+| `Agent.command` | `command(nameOrZ: string \| number, values?: Record<string, string>): string \| null` | The skill's `tool` command with `{placeholder}` slots filled from values; null if the skill has no tool. |
 
 ## Invariants
 
@@ -62,20 +64,21 @@ whole file into context.
 5. `route` returns an empty array when nothing matches; results are sorted by descending score, then ascending z.
 6. `resolve` visits each plane at most once, so dependency cycles terminate.
 7. `inputs` (names) is derived from `inputSchema`, so the two never disagree; a bare input name parses as a required `string`.
-8. `tool` is `null` unless the plane sets a non-empty `tool` attribute.
+8. `tool` is `null` unless the plane sets a non-empty `tool` attribute; `binary` is the first whitespace-token of `tool`, else `null`.
+9. `command` fills `{placeholder}` slots from values and shell-quotes them; a placeholder without a value is left literally in the output.
 
 ## Behavioral Examples
 
 ```
-Given an agent.3md whose skill "code-review" has triggers "review, diff"
-When route("review my diff") is called
-Then "code-review" is returned first with score 2 and hits ["review", "diff"]
+Given an agent.3md whose skill "search" has triggers "search, find, grep"
+When route("find every TODO") is called
+Then "search" is returned first with hits including "find"
 ```
 
 ```
-Given a skill whose body contains [[z=6]] linking to "cite-sources"
-When resolve("code-review") is called
-Then the result is [code-review, cite-sources] in load order
+Given the "search" skill bound to tool "rg --line-number {pattern} {path}"
+When command("search", { pattern: "TODO", path: "src" }) is called
+Then it returns rg --line-number 'TODO' 'src'
 ```
 
 ## Error Cases
@@ -96,3 +99,4 @@ Then the result is [code-review, cite-sources] in load order
 |---------|------|---------|
 | 1 | 2026-06-26 | Initial spec for the reference loader (Agent: manifest / route / get / resolve). |
 | 2 | 2026-06-26 | Add typed inputs (`inputSchema`, `SkillInput`) and per-skill `tool` bindings; additive. |
+| 3 | 2026-06-26 | `tool` is a command template; add `Skill.binary`, `Agent.command`, and exported `fillCommand` / `commandPlaceholders`. Model is now optional. |
