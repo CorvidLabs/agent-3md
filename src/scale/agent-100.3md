@@ -1,0 +1,945 @@
+---
+3md: 1.0
+axis: skill
+title: Atlas-100
+agent: atlas
+model: claude-opus-4-8
+version: "1.0"
+tools: web, bash, fs
+entry: "0"
+note: synthetic agent with 100 skills, for the scaling benchmark.
+---
+A research-and-build agent packaged as one 3md document with 100 skills. The
+runtime loads only the skill plane a request needs.
+
+@plane z=0 label="Atlas" kind=identity
+# Atlas
+
+A careful agent. Route each task to the skill whose triggers match, load that
+plane only, and follow its dependency links. Confirm destructive actions.
+
+@plane z=1 label="cite-sources" kind=skill triggers="cite, source, reference, attribution" inputs="claims"
+# Skill: cite-sources
+
+Attach a verifiable source to every external claim; mark anything unverified.
+
+@plane z=2 label="search-image" kind=skill triggers="search, image, search image, now" inputs="image"
+# Skill: search-image
+
+Search the image. Steps:
+
+1. Validate the incoming image and its parameters.
+2. Search it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=3 label="summarize-asset" kind=skill triggers="summarize, asset, summarize asset, now" inputs="asset"
+# Skill: summarize-asset
+
+Summarize the asset. Steps:
+
+1. Validate the incoming asset and its parameters.
+2. Summarize it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=4 label="translate-event" kind=skill triggers="translate, event, translate event, auto" inputs="event"
+# Skill: translate-event
+
+Translate the event. Steps:
+
+1. Validate the incoming event and its parameters.
+2. Translate it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=5 label="classify-table" kind=skill triggers="classify, table, classify table, this" inputs="table"
+# Skill: classify-table
+
+Classify the table. Steps:
+
+1. Validate the incoming table and its parameters.
+2. Classify it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=6 label="extract-image" kind=skill triggers="extract, image, extract image, now" inputs="image"
+# Skill: extract-image
+
+Extract the image. Steps:
+
+1. Validate the incoming image and its parameters.
+2. Extract it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=7 label="render-query" kind=skill triggers="render, query, render query, please" inputs="query"
+# Skill: render-query
+
+Render the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Render it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=8 label="compile-table" kind=skill triggers="compile, table, compile table, please" inputs="table"
+# Skill: compile-table
+
+Compile the table. Steps:
+
+1. Validate the incoming table and its parameters.
+2. Compile it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=9 label="deploy-stream" kind=skill triggers="deploy, stream, deploy stream, please" inputs="stream"
+# Skill: deploy-stream
+
+Deploy the stream. Steps:
+
+1. Validate the incoming stream and its parameters.
+2. Deploy it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=10 label="encrypt-query" kind=skill triggers="encrypt, query, encrypt query, now" inputs="query"
+# Skill: encrypt-query
+
+Encrypt the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Encrypt it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=11 label="compress-event" kind=skill triggers="compress, event, compress event, please" inputs="event"
+# Skill: compress-event
+
+Compress the event. Steps:
+
+1. Validate the incoming event and its parameters.
+2. Compress it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=12 label="schedule-table" kind=skill triggers="schedule, table, schedule table, now" inputs="table"
+# Skill: schedule-table
+
+Schedule the table. Steps:
+
+1. Validate the incoming table and its parameters.
+2. Schedule it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=13 label="notify-stream" kind=skill triggers="notify, stream, notify stream, please" inputs="stream"
+# Skill: notify-stream
+
+Notify the stream. Steps:
+
+1. Validate the incoming stream and its parameters.
+2. Notify it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=14 label="validate-record" kind=skill triggers="validate, record, validate record, batch" inputs="record"
+# Skill: validate-record
+
+Validate the record. Steps:
+
+1. Validate the incoming record and its parameters.
+2. Validate it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=15 label="format-report" kind=skill triggers="format, report, format report, this" inputs="report"
+# Skill: format-report
+
+Format the report. Steps:
+
+1. Validate the incoming report and its parameters.
+2. Format it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=16 label="parse-data" kind=skill triggers="parse, data, parse data, batch" inputs="data"
+# Skill: parse-data
+
+Parse the data. Steps:
+
+1. Validate the incoming data and its parameters.
+2. Parse it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=17 label="scrape-data" kind=skill triggers="scrape, data, scrape data, please" inputs="data"
+# Skill: scrape-data
+
+Scrape the data. Steps:
+
+1. Validate the incoming data and its parameters.
+2. Scrape it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=18 label="crawl-doc" kind=skill triggers="crawl, doc, crawl doc, auto" inputs="doc"
+# Skill: crawl-doc
+
+Crawl the doc. Steps:
+
+1. Validate the incoming doc and its parameters.
+2. Crawl it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=19 label="index-record" kind=skill triggers="index, record, index record, now" inputs="record"
+# Skill: index-record
+
+Index the record. Steps:
+
+1. Validate the incoming record and its parameters.
+2. Index it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=20 label="embed-doc" kind=skill triggers="embed, doc, embed doc, batch" inputs="doc"
+# Skill: embed-doc
+
+Embed the doc. Steps:
+
+1. Validate the incoming doc and its parameters.
+2. Embed it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=21 label="cluster-query" kind=skill triggers="cluster, query, cluster query, please" inputs="query"
+# Skill: cluster-query
+
+Cluster the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Cluster it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=22 label="rank-data" kind=skill triggers="rank, data, rank data, now" inputs="data"
+# Skill: rank-data
+
+Rank the data. Steps:
+
+1. Validate the incoming data and its parameters.
+2. Rank it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=23 label="dedupe-event" kind=skill triggers="dedupe, event, dedupe event, please" inputs="event"
+# Skill: dedupe-event
+
+Dedupe the event. Steps:
+
+1. Validate the incoming event and its parameters.
+2. Dedupe it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=24 label="merge-stream" kind=skill triggers="merge, stream, merge stream, this" inputs="stream"
+# Skill: merge-stream
+
+Merge the stream. Steps:
+
+1. Validate the incoming stream and its parameters.
+2. Merge it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=25 label="split-report" kind=skill triggers="split, report, split report, please" inputs="report"
+# Skill: split-report
+
+Split the report. Steps:
+
+1. Validate the incoming report and its parameters.
+2. Split it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=26 label="convert-image" kind=skill triggers="convert, image, convert image, auto" inputs="image"
+# Skill: convert-image
+
+Convert the image. Steps:
+
+1. Validate the incoming image and its parameters.
+2. Convert it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=27 label="resize-image" kind=skill triggers="resize, image, resize image, now" inputs="image"
+# Skill: resize-image
+
+Resize the image. Steps:
+
+1. Validate the incoming image and its parameters.
+2. Resize it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=28 label="crop-data" kind=skill triggers="crop, data, crop data, please" inputs="data"
+# Skill: crop-data
+
+Crop the data. Steps:
+
+1. Validate the incoming data and its parameters.
+2. Crop it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=29 label="annotate-table" kind=skill triggers="annotate, table, annotate table, this" inputs="table"
+# Skill: annotate-table
+
+Annotate the table. Steps:
+
+1. Validate the incoming table and its parameters.
+2. Annotate it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=30 label="transcribe-report" kind=skill triggers="transcribe, report, transcribe report, this" inputs="report"
+# Skill: transcribe-report
+
+Transcribe the report. Steps:
+
+1. Validate the incoming report and its parameters.
+2. Transcribe it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=31 label="caption-request" kind=skill triggers="caption, request, caption request, this" inputs="request"
+# Skill: caption-request
+
+Caption the request. Steps:
+
+1. Validate the incoming request and its parameters.
+2. Caption it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=32 label="diff-table" kind=skill triggers="diff, table, diff table, now" inputs="table"
+# Skill: diff-table
+
+Diff the table. Steps:
+
+1. Validate the incoming table and its parameters.
+2. Diff it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=33 label="patch-doc" kind=skill triggers="patch, doc, patch doc, please" inputs="doc"
+# Skill: patch-doc
+
+Patch the doc. Steps:
+
+1. Validate the incoming doc and its parameters.
+2. Patch it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=34 label="lint-ticket" kind=skill triggers="lint, ticket, lint ticket, please" inputs="ticket"
+# Skill: lint-ticket
+
+Lint the ticket. Steps:
+
+1. Validate the incoming ticket and its parameters.
+2. Lint it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=35 label="refactor-query" kind=skill triggers="refactor, query, refactor query, batch" inputs="query"
+# Skill: refactor-query
+
+Refactor the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Refactor it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=36 label="profile-asset" kind=skill triggers="profile, asset, profile asset, this" inputs="asset"
+# Skill: profile-asset
+
+Profile the asset. Steps:
+
+1. Validate the incoming asset and its parameters.
+2. Profile it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=37 label="benchmark-asset" kind=skill triggers="benchmark, asset, benchmark asset, batch" inputs="asset"
+# Skill: benchmark-asset
+
+Benchmark the asset. Steps:
+
+1. Validate the incoming asset and its parameters.
+2. Benchmark it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=38 label="mock-table" kind=skill triggers="mock, table, mock table, please" inputs="table"
+# Skill: mock-table
+
+Mock the table. Steps:
+
+1. Validate the incoming table and its parameters.
+2. Mock it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=39 label="seed-stream" kind=skill triggers="seed, stream, seed stream, this" inputs="stream"
+# Skill: seed-stream
+
+Seed the stream. Steps:
+
+1. Validate the incoming stream and its parameters.
+2. Seed it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=40 label="migrate-event" kind=skill triggers="migrate, event, migrate event, batch" inputs="event"
+# Skill: migrate-event
+
+Migrate the event. Steps:
+
+1. Validate the incoming event and its parameters.
+2. Migrate it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=41 label="backup-request" kind=skill triggers="backup, request, backup request, this" inputs="request"
+# Skill: backup-request
+
+Backup the request. Steps:
+
+1. Validate the incoming request and its parameters.
+2. Backup it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=42 label="restore-file" kind=skill triggers="restore, file, restore file, auto" inputs="file"
+# Skill: restore-file
+
+Restore the file. Steps:
+
+1. Validate the incoming file and its parameters.
+2. Restore it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=43 label="sync-doc" kind=skill triggers="sync, doc, sync doc, auto" inputs="doc"
+# Skill: sync-doc
+
+Sync the doc. Steps:
+
+1. Validate the incoming doc and its parameters.
+2. Sync it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=44 label="upload-doc" kind=skill triggers="upload, doc, upload doc, auto" inputs="doc"
+# Skill: upload-doc
+
+Upload the doc. Steps:
+
+1. Validate the incoming doc and its parameters.
+2. Upload it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=45 label="download-ticket" kind=skill triggers="download, ticket, download ticket, now" inputs="ticket"
+# Skill: download-ticket
+
+Download the ticket. Steps:
+
+1. Validate the incoming ticket and its parameters.
+2. Download it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=46 label="stream-model" kind=skill triggers="stream, model, stream model, please" inputs="model"
+# Skill: stream-model
+
+Stream the model. Steps:
+
+1. Validate the incoming model and its parameters.
+2. Stream it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=47 label="throttle-model" kind=skill triggers="throttle, model, throttle model, this" inputs="model"
+# Skill: throttle-model
+
+Throttle the model. Steps:
+
+1. Validate the incoming model and its parameters.
+2. Throttle it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=48 label="retry-model" kind=skill triggers="retry, model, retry model, now" inputs="model"
+# Skill: retry-model
+
+Retry the model. Steps:
+
+1. Validate the incoming model and its parameters.
+2. Retry it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=49 label="cache-asset" kind=skill triggers="cache, asset, cache asset, please" inputs="asset"
+# Skill: cache-asset
+
+Cache the asset. Steps:
+
+1. Validate the incoming asset and its parameters.
+2. Cache it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=50 label="route-report" kind=skill triggers="route, report, route report, batch" inputs="report"
+# Skill: route-report
+
+Route the report. Steps:
+
+1. Validate the incoming report and its parameters.
+2. Route it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=51 label="balance-report" kind=skill triggers="balance, report, balance report, batch" inputs="report"
+# Skill: balance-report
+
+Balance the report. Steps:
+
+1. Validate the incoming report and its parameters.
+2. Balance it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=52 label="monitor-ticket" kind=skill triggers="monitor, ticket, monitor ticket, please" inputs="ticket"
+# Skill: monitor-ticket
+
+Monitor the ticket. Steps:
+
+1. Validate the incoming ticket and its parameters.
+2. Monitor it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=53 label="alert-stream" kind=skill triggers="alert, stream, alert stream, batch" inputs="stream"
+# Skill: alert-stream
+
+Alert the stream. Steps:
+
+1. Validate the incoming stream and its parameters.
+2. Alert it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=54 label="log-table" kind=skill triggers="log, table, log table, this" inputs="table"
+# Skill: log-table
+
+Log the table. Steps:
+
+1. Validate the incoming table and its parameters.
+2. Log it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=55 label="trace-query" kind=skill triggers="trace, query, trace query, now" inputs="query"
+# Skill: trace-query
+
+Trace the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Trace it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=56 label="audit-file" kind=skill triggers="audit, file, audit file, this" inputs="file"
+# Skill: audit-file
+
+Audit the file. Steps:
+
+1. Validate the incoming file and its parameters.
+2. Audit it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=57 label="redact-data" kind=skill triggers="redact, data, redact data, please" inputs="data"
+# Skill: redact-data
+
+Redact the data. Steps:
+
+1. Validate the incoming data and its parameters.
+2. Redact it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=58 label="anonymize-event" kind=skill triggers="anonymize, event, anonymize event, now" inputs="event"
+# Skill: anonymize-event
+
+Anonymize the event. Steps:
+
+1. Validate the incoming event and its parameters.
+2. Anonymize it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=59 label="sign-query" kind=skill triggers="sign, query, sign query, batch" inputs="query"
+# Skill: sign-query
+
+Sign the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Sign it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=60 label="verify-file" kind=skill triggers="verify, file, verify file, auto" inputs="file"
+# Skill: verify-file
+
+Verify the file. Steps:
+
+1. Validate the incoming file and its parameters.
+2. Verify it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=61 label="authorize-ticket" kind=skill triggers="authorize, ticket, authorize ticket, please" inputs="ticket"
+# Skill: authorize-ticket
+
+Authorize the ticket. Steps:
+
+1. Validate the incoming ticket and its parameters.
+2. Authorize it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=62 label="provision-data" kind=skill triggers="provision, data, provision data, auto" inputs="data"
+# Skill: provision-data
+
+Provision the data. Steps:
+
+1. Validate the incoming data and its parameters.
+2. Provision it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=63 label="snapshot-asset" kind=skill triggers="snapshot, asset, snapshot asset, now" inputs="asset"
+# Skill: snapshot-asset
+
+Snapshot the asset. Steps:
+
+1. Validate the incoming asset and its parameters.
+2. Snapshot it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=64 label="replicate-request" kind=skill triggers="replicate, request, replicate request, please" inputs="request"
+# Skill: replicate-request
+
+Replicate the request. Steps:
+
+1. Validate the incoming request and its parameters.
+2. Replicate it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=65 label="shard-ticket" kind=skill triggers="shard, ticket, shard ticket, batch" inputs="ticket"
+# Skill: shard-ticket
+
+Shard the ticket. Steps:
+
+1. Validate the incoming ticket and its parameters.
+2. Shard it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=66 label="partition-event" kind=skill triggers="partition, event, partition event, batch" inputs="event"
+# Skill: partition-event
+
+Partition the event. Steps:
+
+1. Validate the incoming event and its parameters.
+2. Partition it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=67 label="aggregate-query" kind=skill triggers="aggregate, query, aggregate query, auto" inputs="query"
+# Skill: aggregate-query
+
+Aggregate the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Aggregate it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=68 label="pivot-stream" kind=skill triggers="pivot, stream, pivot stream, now" inputs="stream"
+# Skill: pivot-stream
+
+Pivot the stream. Steps:
+
+1. Validate the incoming stream and its parameters.
+2. Pivot it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=69 label="forecast-table" kind=skill triggers="forecast, table, forecast table, auto" inputs="table"
+# Skill: forecast-table
+
+Forecast the table. Steps:
+
+1. Validate the incoming table and its parameters.
+2. Forecast it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=70 label="simulate-event" kind=skill triggers="simulate, event, simulate event, auto" inputs="event"
+# Skill: simulate-event
+
+Simulate the event. Steps:
+
+1. Validate the incoming event and its parameters.
+2. Simulate it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=71 label="optimize-doc" kind=skill triggers="optimize, doc, optimize doc, this" inputs="doc"
+# Skill: optimize-doc
+
+Optimize the doc. Steps:
+
+1. Validate the incoming doc and its parameters.
+2. Optimize it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=72 label="solve-report" kind=skill triggers="solve, report, solve report, auto" inputs="report"
+# Skill: solve-report
+
+Solve the report. Steps:
+
+1. Validate the incoming report and its parameters.
+2. Solve it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=73 label="sketch-data" kind=skill triggers="sketch, data, sketch data, this" inputs="data"
+# Skill: sketch-data
+
+Sketch the data. Steps:
+
+1. Validate the incoming data and its parameters.
+2. Sketch it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=74 label="compose-record" kind=skill triggers="compose, record, compose record, now" inputs="record"
+# Skill: compose-record
+
+Compose the record. Steps:
+
+1. Validate the incoming record and its parameters.
+2. Compose it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=75 label="tag-data" kind=skill triggers="tag, data, tag data, batch" inputs="data"
+# Skill: tag-data
+
+Tag the data. Steps:
+
+1. Validate the incoming data and its parameters.
+2. Tag it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=76 label="categorize-query" kind=skill triggers="categorize, query, categorize query, this" inputs="query"
+# Skill: categorize-query
+
+Categorize the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Categorize it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=77 label="recommend-request" kind=skill triggers="recommend, request, recommend request, please" inputs="request"
+# Skill: recommend-request
+
+Recommend the request. Steps:
+
+1. Validate the incoming request and its parameters.
+2. Recommend it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=78 label="personalize-event" kind=skill triggers="personalize, event, personalize event, auto" inputs="event"
+# Skill: personalize-event
+
+Personalize the event. Steps:
+
+1. Validate the incoming event and its parameters.
+2. Personalize it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=79 label="segment-image" kind=skill triggers="segment, image, segment image, please" inputs="image"
+# Skill: segment-image
+
+Segment the image. Steps:
+
+1. Validate the incoming image and its parameters.
+2. Segment it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=80 label="price-record" kind=skill triggers="price, record, price record, batch" inputs="record"
+# Skill: price-record
+
+Price the record. Steps:
+
+1. Validate the incoming record and its parameters.
+2. Price it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=81 label="invoice-query" kind=skill triggers="invoice, query, invoice query, auto" inputs="query"
+# Skill: invoice-query
+
+Invoice the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Invoice it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=82 label="reconcile-report" kind=skill triggers="reconcile, report, reconcile report, please" inputs="report"
+# Skill: reconcile-report
+
+Reconcile the report. Steps:
+
+1. Validate the incoming report and its parameters.
+2. Reconcile it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=83 label="budget-ticket" kind=skill triggers="budget, ticket, budget ticket, this" inputs="ticket"
+# Skill: budget-ticket
+
+Budget the ticket. Steps:
+
+1. Validate the incoming ticket and its parameters.
+2. Budget it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=84 label="estimate-request" kind=skill triggers="estimate, request, estimate request, auto" inputs="request"
+# Skill: estimate-request
+
+Estimate the request. Steps:
+
+1. Validate the incoming request and its parameters.
+2. Estimate it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=85 label="assign-report" kind=skill triggers="assign, report, assign report, now" inputs="report"
+# Skill: assign-report
+
+Assign the report. Steps:
+
+1. Validate the incoming report and its parameters.
+2. Assign it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=86 label="approve-image" kind=skill triggers="approve, image, approve image, auto" inputs="image"
+# Skill: approve-image
+
+Approve the image. Steps:
+
+1. Validate the incoming image and its parameters.
+2. Approve it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=87 label="escalate-doc" kind=skill triggers="escalate, doc, escalate doc, now" inputs="doc"
+# Skill: escalate-doc
+
+Escalate the doc. Steps:
+
+1. Validate the incoming doc and its parameters.
+2. Escalate it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=88 label="triage-request" kind=skill triggers="triage, request, triage request, please" inputs="request"
+# Skill: triage-request
+
+Triage the request. Steps:
+
+1. Validate the incoming request and its parameters.
+2. Triage it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=89 label="diagnose-file" kind=skill triggers="diagnose, file, diagnose file, now" inputs="file"
+# Skill: diagnose-file
+
+Diagnose the file. Steps:
+
+1. Validate the incoming file and its parameters.
+2. Diagnose it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=90 label="rollback-image" kind=skill triggers="rollback, image, rollback image, please" inputs="image"
+# Skill: rollback-image
+
+Rollback the image. Steps:
+
+1. Validate the incoming image and its parameters.
+2. Rollback it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=91 label="canary-query" kind=skill triggers="canary, query, canary query, this" inputs="query"
+# Skill: canary-query
+
+Canary the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Canary it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=92 label="experiment-event" kind=skill triggers="experiment, event, experiment event, batch" inputs="event"
+# Skill: experiment-event
+
+Experiment the event. Steps:
+
+1. Validate the incoming event and its parameters.
+2. Experiment it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=93 label="measure-query" kind=skill triggers="measure, query, measure query, now" inputs="query"
+# Skill: measure-query
+
+Measure the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Measure it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=94 label="visualize-query" kind=skill triggers="visualize, query, visualize query, batch" inputs="query"
+# Skill: visualize-query
+
+Visualize the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Visualize it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=95 label="chart-event" kind=skill triggers="chart, event, chart event, batch" inputs="event"
+# Skill: chart-event
+
+Chart the event. Steps:
+
+1. Validate the incoming event and its parameters.
+2. Chart it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=96 label="geocode-ticket" kind=skill triggers="geocode, ticket, geocode ticket, auto" inputs="ticket"
+# Skill: geocode-ticket
+
+Geocode the ticket. Steps:
+
+1. Validate the incoming ticket and its parameters.
+2. Geocode it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=97 label="navigate-query" kind=skill triggers="navigate, query, navigate query, now" inputs="query"
+# Skill: navigate-query
+
+Navigate the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Navigate it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+
+@plane z=98 label="transcode-query" kind=skill triggers="transcode, query, transcode query, please" inputs="query"
+# Skill: transcode-query
+
+Transcode the query. Steps:
+
+1. Validate the incoming query and its parameters.
+2. Transcode it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=99 label="watermark-model" kind=skill triggers="watermark, model, watermark model, now" inputs="model"
+# Skill: watermark-model
+
+Watermark the model. Steps:
+
+1. Validate the incoming model and its parameters.
+2. Watermark it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+- cross-check results against [[z=1|cite-sources]].
+
+@plane z=100 label="vectorize-stream" kind=skill triggers="vectorize, stream, vectorize stream, batch" inputs="stream"
+# Skill: vectorize-stream
+
+Vectorize the stream. Steps:
+
+1. Validate the incoming stream and its parameters.
+2. Vectorize it using the appropriate backend/tool.
+3. Return a structured result the caller can act on.
+

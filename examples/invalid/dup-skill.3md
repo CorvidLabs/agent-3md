@@ -1,0 +1,19 @@
+---
+3md: 1.0
+axis: skill
+title: Duplicate Skill Agent
+model: claude-opus-4-8
+---
+Violates: two skills share the label "search".
+
+@plane z=0 label="Agent" kind=identity
+# Agent
+Route requests to skills.
+
+@plane z=1 label="search" kind=skill triggers="search, find"
+# Skill: search
+Find things on the web.
+
+@plane z=2 label="search" kind=skill triggers="lookup, grep"
+# Skill: search
+Find things in files.

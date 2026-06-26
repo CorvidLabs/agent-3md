@@ -1,24 +1,69 @@
-# agent-3md
+# agent.3md — a standard for agents in one file
 
-**One 3md file is an entire agent.** Plane 0 is the agent (identity, rules);
-every other plane is a skill. The document's frontmatter is the manifest, each
-plane's attributes (`triggers=`, `inputs=`, `cost=`) are the queryable index,
-and `[[z=N|..]]` links are skill dependencies.
+**One plain-text 3md file is a whole agent.** Plane 0 is the agent (identity,
+rules); every other plane is a skill. The frontmatter is the manifest, each
+plane's attributes (`triggers=`, `inputs=`, `cost=`) are a queryable index, and
+`[[z=N|..]]` links are the skill dependency graph.
 
-The runtime parses the file once (canonical 3md parser, vendored), builds an
-index, and then:
+The same file is human-readable documentation *and* a machine-queryable skill
+index, so the two can never drift. And because skills are addressable planes, an
+agent loads **only the one skill it needs** per turn (progressive disclosure)
+instead of stuffing every skill into context.
 
-- **routes** free text to the best skill via a trigger index (microseconds),
-- **fetches** a single skill's body on demand — *progressive disclosure*, you
-  load only the plane you need, not the whole agent,
-- **resolves** a skill's dependency chain via its cross-plane links.
+## Why it's good for agents
 
+- **Progressive disclosure.** At 100 skills, loading only the routed skill uses
+  **~83% fewer tokens/turn (1420 vs 8300)**, and the gap widens with every skill
+  added (`bun run scale`).
+- **One artifact, two readers.** Read it as docs; parse it as an index.
+- **Portable.** The 3md parser exists in Swift, TypeScript, and Rust, so the
+  same agent file loads anywhere.
+- **Checkable.** A conformance validator makes it a real standard, not a vibe.
+
+## The standard
+
+[`SPEC.md`](./SPEC.md) defines **agent3md/1**: manifest frontmatter, the one
+identity plane vs skill planes, the skill contract (triggers / inputs / cost /
+dependency links), the loader contract (`manifest` / `route` / `get` /
+`resolve`), and the MUST/SHOULD conformance rules.
+
+## What's here
+
+| file | what |
+|---|---|
+| `agent.3md` | the example agent (Atlas): identity + 6 skills |
+| `SPEC.md` | the agent3md/1 standard |
+| `src/threemd.ts` | the canonical 3md parser (vendored) |
+| `src/runtime.ts` | reference loader: `manifest / route / get / resolve` |
+| `src/validate.ts` | conformance validator (+ `examples/invalid/` fixtures) |
+| `src/cli.ts` | `agent3md` CLI |
+| `src/mcp.ts` | MCP server: exposes an agent's skills as MCP tools |
+| `src/benchmark.ts`, `src/scale/` | token-savings proof, single + scaled |
+
+## Try it
+
+```sh
+bun run demo          # load Atlas, route requests, fetch one skill
+bun run run           # route -> load -> EXECUTE (sql-query hits a live DB)
+bun run validate agent.3md   # conformance check (exit non-zero on errors)
+bun run test          # validator conformance suite
+bun run benchmark     # token savings on the example agent
+bun run scale         # the savings curve at 10/25/50/100 skills
+bun run cli route agent.3md "what rows have a null total?"
+bun run mcp:selftest  # spawn the MCP server and call its tools
 ```
-bun run demo
+
+### Use it from any MCP client
+
+Point an MCP-capable agent at the server; its skills appear as tools
+(`list_skills`, `route_skill`, `get_skill`, `resolve_skill`):
+
+```json
+{ "command": "bun", "args": ["src/mcp.ts", "agent.3md"] }
 ```
 
-Why 3md fits agents: one artifact that is human-readable docs *and* a
-machine-queryable skill index, with addressable records (planes), a typed header
-(frontmatter), and explicit skill graph (links). Editing the agent = editing one
-plain-text file; the skills can't drift from the index because they're the same
-bytes.
+## Status
+
+v1 reference kit (TypeScript). Roadmap: loaders in Swift/Rust (the parser already
+exists there), a JSON manifest projection, typed skill inputs, and tool bindings
+so a skill body can declare the tool it drives. See `SPEC.md` §future.

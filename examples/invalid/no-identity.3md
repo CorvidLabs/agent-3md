@@ -1,0 +1,15 @@
+---
+3md: 1.0
+axis: skill
+title: No Identity Agent
+model: claude-opus-4-8
+---
+Violates: there is no plane marked kind=identity.
+
+@plane z=0 label="search" kind=skill triggers="search, find"
+# Skill: search
+Find things.
+
+@plane z=1 label="summarize" kind=skill triggers="summarize, tldr"
+# Skill: summarize
+Condense text.

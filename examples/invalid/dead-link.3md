@@ -1,0 +1,15 @@
+---
+3md: 1.0
+axis: skill
+title: Dead Link Agent
+model: claude-opus-4-8
+---
+Violates: a skill links to [[z=99]], which does not exist.
+
+@plane z=0 label="Agent" kind=identity
+# Agent
+Route requests to skills.
+
+@plane z=1 label="search" kind=skill triggers="search, find"
+# Skill: search
+Find things, then [[z=99|cite-sources]].

@@ -3,10 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "One 3md file as an entire agent: plane 0 is the agent, every other plane is a skill, queried and fetched on demand.",
+  "description": "The agent.3md standard: one 3md file is a whole agent (identity + on-demand skills), with a loader, validator, CLI, and MCP server.",
   "scripts": {
     "demo": "bun run src/demo.ts",
+    "run": "bun run src/run.ts",
     "benchmark": "bun run src/benchmark.ts",
-    "run": "bun run src/run.ts"
+    "validate": "bun run src/validate.ts",
+    "test": "bun test",
+    "cli": "bun run src/cli.ts",
+    "mcp": "bun run src/mcp.ts",
+    "mcp:selftest": "bun run src/mcp-selftest.ts",
+    "gen:agents": "bun run src/scale/gen-big-agent.ts",
+    "scale": "bun run src/scale/scale-bench.ts"
   }
 }
