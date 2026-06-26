@@ -75,7 +75,7 @@ const agentPath = fileURLToPath(new URL("../agent.3md", import.meta.url));
 const client = new McpClient(["bun", mcpPath, agentPath]);
 
 const init = await client.call("initialize", { protocolVersion: "2024-11-05", capabilities: {} });
-log("agent.3md  x  MCP  —  route -> load -> execute (all over the MCP round-trip)");
+log("agent.3md  x  MCP  -  route -> load -> execute (all over the MCP round-trip)");
 log("=".repeat(68));
 log(`connected: ${init.result.serverInfo.name}  (proto ${init.result.protocolVersion})`);
 
@@ -106,7 +106,7 @@ log("plane; the orchestrator executed it. The SQL result above is a live query."
 client.close();
 
 // --- persist the transcript as documentation ---
-const md = `# agent.3md over MCP — integration demo
+const md = `# agent.3md over MCP - integration demo
 
 An orchestrator drives the \`agent.3md\` MCP server (\`src/mcp.ts\`) over stdio.
 For each request it calls \`route_skill\` to pick a skill, \`get_skill\` to load

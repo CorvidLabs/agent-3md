@@ -170,5 +170,5 @@ shared conformance suite, `agent3md/1` loaders can be implemented identically in
 each: the format does the parsing, this spec defines the agent layer on top. A
 future revision may standardize richer attributes (typed `inputs`, explicit
 `tool` bindings per skill, capability scopes) and a small JSON projection of the
-manifest for cross-process discovery — additively, without breaking `agent3md/1`.
+manifest for cross-process discovery - additively, without breaking `agent3md/1`.
 ```
