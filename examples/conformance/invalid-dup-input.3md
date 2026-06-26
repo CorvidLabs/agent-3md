@@ -1,0 +1,12 @@
+---
+3md: 1.0
+title: DupInput
+model: claude-opus-4-8
+---
+@plane z=0 label="DupInput" kind=identity
+# DupInput
+Identity.
+
+@plane z=1 label="s" kind=skill triggers="x" inputs="a:string, a:number"
+# Skill: s
+The input name "a" is declared twice. RULE: dup-input.

@@ -26,7 +26,7 @@ A careful research-and-build agent. Operating rules:
 When a task arrives, route it to the skill whose triggers match, load that
 plane only, and follow its dependency links if it declares any.
 
-@plane z=1 label="web-research" kind=skill triggers="search, find, look up, research, latest, news, who, what, when" inputs="query" cost="net"
+@plane z=1 label="web-research" kind=skill triggers="search, find, look up, research, latest, news, who, what, when" inputs="query:string, count:number?" tool="web.search" cost="net"
 # Skill: web-research
 
 Find current information on the open web.
@@ -35,7 +35,7 @@ Find current information on the open web.
 2. Open the most authoritative results, extract the relevant passages.
 3. Always pair findings with [[z=6|cite-sources]].
 
-@plane z=2 label="pdf-extract" kind=skill triggers="pdf, extract, document, parse file, scan, ocr" inputs="path"
+@plane z=2 label="pdf-extract" kind=skill triggers="pdf, extract, document, parse file, scan, ocr" inputs="path:string" tool="fs.read_pdf"
 # Skill: pdf-extract
 
 Pull structured content out of a PDF or scanned document.
@@ -44,7 +44,7 @@ Pull structured content out of a PDF or scanned document.
 - Return tables as arrays, headings as an outline.
 - Large files: stream page by page; summarize with [[z=4|summarize]].
 
-@plane z=3 label="sql-query" kind=skill triggers="sql, database, query, table, rows, select, postgres" inputs="question, schema" cost="db"
+@plane z=3 label="sql-query" kind=skill triggers="sql, database, query, table, rows, select, postgres" inputs="question:string, schema:string, limit:number?" tool="db.query" cost="db"
 # Skill: sql-query
 
 Answer questions against a SQL database.

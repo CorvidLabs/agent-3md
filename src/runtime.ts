@@ -5,11 +5,20 @@
 // demand (progressive disclosure) instead of loading the whole file.
 import { parse, type Document, type Plane } from "./threemd";
 
+/** A declared input to a skill: its name, a type token, and whether it is required. */
+export interface SkillInput {
+  readonly name: string;
+  readonly type: string;        // a canonical type token (string/number/boolean/object/array); see SPEC.md
+  readonly required: boolean;
+}
+
 export interface Skill {
   readonly z: number;
   readonly name: string;
   readonly triggers: string[];
-  readonly inputs: string[];
+  readonly inputs: string[];        // input names in declared order (back-compatible with the bare CSV form)
+  readonly inputSchema: SkillInput[]; // the typed inputs parsed from `inputs="name:type?"`
+  readonly tool: string | null;     // the tool / function this skill drives, from `tool=` (null if unbound)
   readonly cost: string | null;
   readonly deps: number[];      // z indices of [[z=N]] / [[z=N|label]] links in the body
   readonly body: string;
@@ -29,11 +38,25 @@ export interface AgentManifest {
   readonly tools: string[];
   readonly persona: string;
   readonly identity: string;    // plane 0 body
-  readonly skills: { name: string; z: number; triggers: string[]; cost: string | null }[];
+  readonly skills: { name: string; z: number; triggers: string[]; cost: string | null; tool: string | null }[];
 }
 
 const csv = (v: string | undefined): string[] =>
   v ? v.split(",").map((s) => s.trim()).filter(Boolean) : [];
+
+// Parse a typed input list: `inputs="question, limit:number?, schema:string"`.
+// Each item is `name`, `name:type`, or `name:type?` (a trailing `?` marks it
+// optional). A bare name defaults to type "string" and required. One grammar,
+// shared with the Rust and Swift loaders so the typed contract never diverges.
+const parseInputs = (v: string | undefined): SkillInput[] =>
+  csv(v).map((item) => {
+    let s = item, required = true;
+    if (s.endsWith("?")) { required = false; s = s.slice(0, -1).trimEnd(); }
+    const i = s.indexOf(":");
+    const name = (i === -1 ? s : s.slice(0, i)).trim();
+    const type = (i === -1 ? "string" : s.slice(i + 1).trim().toLowerCase()) || "string";
+    return { name, type, required };
+  }).filter((x) => x.name.length > 0);
 
 export class Agent {
   private doc: Document;
@@ -48,11 +71,14 @@ export class Agent {
     this.identityPlane = identity;
     for (const p of this.doc.planes) {
       if (p === identity) continue;
+      const inputSchema = parseInputs(p.attributes.inputs);
       const skill: Skill = {
         z: p.z,
         name: p.label ?? `skill-${p.z}`,
         triggers: csv(p.attributes.triggers),
-        inputs: csv(p.attributes.inputs),
+        inputs: inputSchema.map((x) => x.name),
+        inputSchema,
+        tool: p.attributes.tool?.trim() || null,
         cost: p.attributes.cost ?? null,
         deps: [...p.body.matchAll(LINK_RE)].map((m) => Number(m[1])),
         body: p.body,
@@ -71,7 +97,7 @@ export class Agent {
       tools: csv(m.tools),
       persona: m.persona ?? "",
       identity: this.identityPlane.body,
-      skills: [...this.byName.values()].map((s) => ({ name: s.name, z: s.z, triggers: s.triggers, cost: s.cost })),
+      skills: [...this.byName.values()].map((s) => ({ name: s.name, z: s.z, triggers: s.triggers, cost: s.cost, tool: s.tool })),
     };
   }
 

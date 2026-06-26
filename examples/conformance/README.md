@@ -16,6 +16,7 @@ Reference check (this repo): `bun run src/validate.ts examples/conformance/<file
 | `valid-cost.3md` | optional `cost=` tags and `inputs=` on skills |
 | `valid-entry.3md` | `entry:` frontmatter resolving to a real plane |
 | `valid-fallback-identity.3md` | no `kind=identity`: the first plane is the identity by the fallback rule |
+| `valid-typed-inputs.3md` | typed inputs (`name:type?`) and a per-skill `tool=` binding |
 
 ## Invalid (one rule each)
 
@@ -28,6 +29,8 @@ Reference check (this repo): `bun run src/validate.ts examples/conformance/<file
 | `invalid-cycle.3md` | `cycle` | a `[[z=N]]` dependency chain forms a loop |
 | `invalid-missing-frontmatter.3md` | `frontmatter` | missing required `model:` |
 | `invalid-bad-entry.3md` | `entry` | `entry:` is not a real plane `z` |
+| `invalid-bad-input-type.3md` | `input-type` | an input declares a type outside the canonical set |
+| `invalid-dup-input.3md` | `dup-input` | a skill declares the same input name twice |
 
 Each invalid file violates exactly one rule and is otherwise conforming, so a
 correct validator should report that rule (and only that rule) as the error.

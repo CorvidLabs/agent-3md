@@ -56,3 +56,21 @@ test("bad-entry fixture is caught by the entry rule", () => {
   expect(r.ok).toBe(false);
   expect(rules(r)).toContain("entry");
 });
+
+test("typed inputs + tool binding fixture is valid", () => {
+  const r = validateAgent(read("../examples/conformance/valid-typed-inputs.3md"));
+  expect(r.errors).toEqual([]);
+  expect(r.ok).toBe(true);
+});
+
+test("a non-canonical input type is caught by the input-type rule", () => {
+  const r = validateAgent(read("../examples/conformance/invalid-bad-input-type.3md"));
+  expect(r.ok).toBe(false);
+  expect(rules(r)).toContain("input-type");
+});
+
+test("a duplicate input name is caught by the dup-input rule", () => {
+  const r = validateAgent(read("../examples/conformance/invalid-dup-input.3md"));
+  expect(r.ok).toBe(false);
+  expect(rules(r)).toContain("dup-input");
+});
