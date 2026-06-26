@@ -1,0 +1,5 @@
+[registry]
+name = "agent-3md"
+
+[specs]
+runtime = "specs/runtime/runtime.spec.md"
