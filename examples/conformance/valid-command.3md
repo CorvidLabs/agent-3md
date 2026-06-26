@@ -1,0 +1,14 @@
+---
+3md: 1.0
+axis: skill
+agent: grep
+tools: rg
+---
+@plane z=0 label="grep" kind=identity
+# grep
+Identity. No model line: model is an optional hint, not required.
+
+@plane z=1 label="search" kind=skill triggers="search, find" inputs="pattern:string, path:string" tool="rg --line-number {pattern} {path}"
+# Skill: search
+A command-backed skill: every `{placeholder}` is a declared input, every input
+is used, and the binary `rg` is declared in `tools`. RULE: valid.

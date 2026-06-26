@@ -37,14 +37,16 @@ The frontmatter is the agent's manifest.
 |-----|------|---------|
 | `3md` | **MUST** | Base-format version. `1.0`. |
 | `title` *or* `agent` | **MUST** | The agent's name. (`title` is the display name; `agent` is a short id.) |
-| `model` | **MUST** | Default model id the agent runs on. |
+| `model` | MAY | A *suggested* default model the agent was built against. It is a hint, not a requirement: the runner may override it, and the agent should work on any sufficiently capable model. Omit it to stay model-agnostic. |
 | `axis` | SHOULD | `skill` (the Z axis enumerates skills). |
-| `version` | MAY | Agent version, distinct from the format version. |
-| `tools` | MAY | Comma-separated tool/capability names the agent may use. |
+| `tools` | MAY | Comma-separated names of the real binaries the agent's skills run (e.g. `rg, jq, git`). When present, a skill's bound command SHOULD use one of them. |
 | `persona` | MAY | One-line behavioral summary. |
+| `version` | MAY | Agent version, distinct from the format version. |
 | `entry` | MAY | The `z` of the plane to start from (default: the identity plane). |
 
-Any other frontmatter key is preserved as agent metadata and is implementation-defined.
+The only required frontmatter is `3md` and a name. Everything else, `model`
+included, is an optional hint. Any other key is preserved as agent metadata and
+is implementation-defined.
 
 ### 2.2 Planes (identity + skills)
 
@@ -67,7 +69,7 @@ A skill plane is `@plane z=N label="<name>" kind=skill` plus these attributes:
 |-----------|---------|
 | `triggers` | Comma-separated trigger phrases. A phrase matches a request when **every** word in the phrase appears in the request (case-insensitive). So `look up` matches only when both `look` and `up` are present, never on `up` alone. |
 | `inputs` | Comma-separated typed inputs the skill expects (see below). |
-| `tool` | Optional. The id of the concrete tool or function this skill drives, e.g. `db.query`. A loader can route a request to the skill and then call this tool with the skill's inputs. |
+| `tool` | Optional. A runnable command this skill drives, as a template, e.g. `rg --line-number {pattern} {path}`. The first token is the binary; `{name}` placeholders are filled from the skill's inputs (see below). |
 | `cost` | Optional tag for side-effect / resource class (e.g. `net`, `db`). |
 
 **Typed inputs.** Each item in `inputs` is `name`, `name:type`, or `name:type?`.
@@ -76,6 +78,19 @@ name (`question`) is a required `string`. `type` is one of a closed set:
 `string`, `number`, `boolean`, `object`, `array`. The bare comma-separated form
 (`inputs="question, schema"`) is still valid: every name is a required `string`,
 so older agents keep working unchanged.
+
+**Command templates.** When `tool` is a command, its `{placeholder}` slots name
+the skill's inputs. The contract that ties them together:
+
+- Every `{placeholder}` in the command **MUST** be a declared input.
+- A declared input the command never references is a likely mistake (a SHOULD;
+  loaders warn).
+- The command's binary (its first token) SHOULD appear in the agent's `tools`.
+
+A loader fills the template from concrete values (shell-quoting them) to produce
+the exact command to run. The loop is **route -> fill -> run**: route a request
+to a skill, fill its inputs, run its command. A `tool` without placeholders (a
+bare binary, or an opaque id) is still valid; it just is not parameterized.
 
 The plane **body** is the skill's instructions, the prompt the agent loads when
 the skill is selected.
@@ -88,15 +103,16 @@ everything it needs.
 Example skill plane:
 
 ```
-@plane z=3 label="sql-query" kind=skill triggers="sql, database, query, rows, select" inputs="question:string, schema:string, limit:number?" tool="db.query" cost="db"
-# Skill: sql-query
+@plane z=1 label="search" kind=skill triggers="search, find, grep, code" inputs="pattern:string, path:string" tool="rg --line-number {pattern} {path}"
+# Skill: search
 
-Answer questions against a SQL database.
-
-1. Read the schema; map the question to tables/columns.
-2. Write a single read-only SELECT; confirm before any mutation.
-3. Cite the result set (see [[z=6|cite-sources]]).
+Find code by regex. Prefer this over reading whole files. Fill {pattern} (the
+regex) and {path} (a file or directory), then run. For broader context, see
+[[z=2|files]].
 ```
+
+`route("find every TODO")` selects `search`; filling `pattern=TODO path=src`
+yields `rg --line-number 'TODO' 'src'`.
 
 ---
 
@@ -112,10 +128,11 @@ reference implementation):
 | `route(text)` | Skills whose triggers `text` satisfies, ranked by the number of **distinct trigger phrases matched** (best first), ties broken by lower `z`; each result carries the matched phrases. Tokens are maximal runs of Unicode letters/digits, lowercased. No match returns an empty list. |
 | `get(name \| z)` | A single skill including its full body. O(1). |
 | `resolve(name \| z)` | The skill plus its transitive dependency chain (following `[[z=N]]` / `[[z=N|label]]` links), each skill once, dependency-complete. |
+| `command(name \| z, values)` | The skill's `tool` command with its `{placeholder}` slots filled (shell-quoted) from `values`; null if the skill has no `tool`. |
 
-The intended loop is **route → load → execute**: route the request, load only
-the resolved skill chain, run it. `manifest()` is cheap to keep resident;
-skill bodies are fetched on demand.
+The intended loop is **route -> fill -> run**: route the request, fill the chosen
+skill's inputs, run its command. `manifest()` is cheap to keep resident; skill
+bodies (and their commands) are fetched on demand.
 
 ---
 
@@ -124,7 +141,7 @@ skill bodies are fetched on demand.
 A document is a conforming `agent3md/1` agent if:
 
 - **MUST** be valid 3md (`3md: 1.0`) and parse without error.
-- **MUST** have a name (`title` or `agent`) and a `model`.
+- **MUST** have a name (`title` or `agent`). `model` is an optional hint, not required.
 - **MUST** have exactly one identity plane (explicit `kind=identity`, or the
   first plane by the fallback rule). All other planes are skills.
 - **MUST** give every skill a unique, non-empty name (`label`).
@@ -139,6 +156,10 @@ A document is a conforming `agent3md/1` agent if:
   `boolean`, `object`, `array`); a bare name is a required `string`.
 - **MUST NOT** declare the same input name twice within one skill.
 - **SHOULD**, if a skill sets `tool`, make it non-empty.
+- **MUST**, for each `{placeholder}` in a skill's `tool` command, have a matching
+  declared input. (A declared input the command never uses is a SHOULD-not.)
+- **SHOULD**, when `tools` is declared, have each skill's command binary listed
+  in it (so the manifest does not lie about what the agent runs).
 
 A conforming loader **MUST** ignore unknown frontmatter keys and unknown plane
 attributes rather than failing.
@@ -151,27 +172,26 @@ attributes rather than failing.
 ---
 3md: 1.0
 axis: skill
-title: Scout
-model: claude-opus-4-8
-tools: web
+agent: dev
+tools: rg, fd
 ---
-Scout finds things and explains them plainly.
+A terminal-first dev agent. No model line: the runner picks the model.
 
-@plane z=0 label="Scout" kind=identity
-# Scout
-Route each request to the matching skill, load only that plane, and act.
+@plane z=0 label="dev" kind=identity
+# dev
+Route each request to the matching skill, fill its inputs, run its command.
 
-@plane z=1 label="search" kind=skill triggers="find, search, look up, latest" inputs="query"
+@plane z=1 label="search" kind=skill triggers="find, search, grep, code" inputs="pattern:string, path:string" tool="rg --line-number {pattern} {path}"
 # Skill: search
-Issue 2-3 queries, read the best results, then hand off to [[z=2|explain]].
+Find code by regex. For filenames instead of contents, see [[z=2|files]].
 
-@plane z=2 label="explain" kind=skill triggers="explain, eli5, what is, how does" inputs="topic"
-# Skill: explain
-Give the one-sentence answer first, then three plain bullets.
+@plane z=2 label="files" kind=skill triggers="files, list, locate, glob" inputs="glob:string, dir:string" tool="fd {glob} {dir}"
+# Skill: files
+List files matching a name pattern under a directory.
 ```
 
-`route("find the latest on X")` → `search`; `resolve("search")` →
-`[search, explain]`; `get("explain")` → just that plane's body.
+`route("find every TODO")` selects `search`; `command("search", {pattern: "TODO",
+path: "src"})` yields `rg --line-number 'TODO' 'src'`.
 
 ---
 

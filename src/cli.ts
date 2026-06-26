@@ -7,7 +7,7 @@
 // recognized when the argument exists on disk or ends in `.3md`.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { Agent } from "./runtime";
+import { Agent, commandPlaceholders } from "./runtime";
 
 const DEFAULT_FILE = fileURLToPath(new URL("../agent.3md", import.meta.url));
 
@@ -23,13 +23,17 @@ commands:
   route    [file] <text>     rank skills matching the request + the load chain
   get      [file] <skill>    print one skill's body (progressive disclosure)
   resolve  [file] <skill>    a skill plus its transitive dependency chain
+  run      [file] <text> [k=v ...] [--exec]
+                             route the request, fill the skill's command from
+                             k=v inputs, print it; --exec runs it
 
   [file] defaults to ${DEFAULT_FILE}
 examples:
   bun run src/cli.ts manifest
-  bun run src/cli.ts route "what rows have a null total?"
-  bun run src/cli.ts get sql-query
-  bun run src/cli.ts resolve web-research`;
+  bun run src/cli.ts route "find every TODO in the tree"
+  bun run src/cli.ts get search
+  bun run src/cli.ts run "find every TODO" pattern=TODO path=src
+  bun run src/cli.ts run "find every TODO" pattern=TODO path=src --exec`;
 
 function fail(msg: string): never {
   console.error(msg + "\n\n" + USAGE);
@@ -62,34 +66,36 @@ if (cmd === "new") {
   const scaffold = `---
 3md: 1.0
 axis: skill
-title: ${name}
 agent: ${slug}
-model: claude-opus-4-8
+persona: terminal-first; reach for one precise command instead of reading files
+tools: rg, jq
 ---
 ${name} is an agent packaged as one 3md file: plane 0 is the agent, every other
-plane is a skill, loaded on demand. Edit the skills below or add @plane skills.
+plane is a skill, loaded on demand. Each skill binds to a real command and
+declares its typed inputs, so routing a request yields a command you can run.
 
 @plane z=0 label="${name}" kind=identity
 # ${name}
 
 Operating rules. Route each task to the skill whose triggers match, load that
-plane only, then follow its dependency links.
+plane only, fill its inputs, then run its command.
 
-@plane z=1 label="search" kind=skill triggers="search, find, look up, latest" inputs="query"
+@plane z=1 label="search" kind=skill triggers="search, find, grep, code" inputs="pattern:string, path:string" tool="rg --line-number {pattern} {path}"
 # Skill: search
 
-Find information for a request, then pair the findings with [[z=2|summarize]].
+Find code by regex. Prefer this over reading whole files. Fill {pattern} and
+{path}, then run.
 
-@plane z=2 label="summarize" kind=skill triggers="summarize, tldr, condense, brief" inputs="text"
-# Skill: summarize
+@plane z=2 label="json" kind=skill triggers="json, jq, query, field" inputs="filter:string, file:string" tool="jq {filter} {file}"
+# Skill: json
 
-Condense text: lead with the one-sentence answer, then the load-bearing points.
+Query or reshape a JSON file. Fill {filter} (a jq program) and {file}.
 `;
   writeFileSync(outfile, scaffold);
   console.log(`wrote ${outfile}`);
   console.log(`next:`);
   console.log(`  bun run src/validate.ts ${outfile}                 # check it conforms`);
-  console.log(`  bun run src/cli.ts route ${outfile} "find the latest notes"`);
+  console.log(`  bun run src/cli.ts run ${outfile} "find every TODO" pattern=TODO path=src`);
   console.log(`  bun run src/mcp.ts ${outfile}                      # serve its skills over MCP`);
   process.exit(0);
 }
@@ -99,12 +105,12 @@ const { file, rest: args } = splitFile(rest);
 switch (cmd) {
   case "manifest": {
     const m = load(file).manifest();
-    console.log(`${m.name}  (${m.model})`);
+    console.log(`${m.name}${m.model && m.model !== "unknown" ? `  (${m.model})` : ""}`);
     if (m.persona) console.log(`  persona: ${m.persona}`);
     console.log(`  tools:   ${m.tools.join(", ") || "(none)"}`);
     console.log(`  skills:  ${m.skills.length}`);
     for (const s of m.skills) {
-      console.log(`    - ${s.name}${s.cost ? ` [${s.cost}]` : ""}`);
+      console.log(`    - ${s.name}${s.cost ? ` [${s.cost}]` : ""}${s.tool ? `  ->  ${s.tool}` : ""}`);
       console.log(`        triggers: ${s.triggers.join(", ")}`);
     }
     break;
@@ -130,7 +136,7 @@ switch (cmd) {
   }
   case "get": {
     const name = args.join(" ").trim();
-    if (!name) fail("get needs a skill name, e.g. get sql-query");
+    if (!name) fail("get needs a skill name, e.g. get search");
     const skill = load(file).get(name);
     if (!skill) fail(`no such skill: ${name}`);
     const fmtInputs = skill.inputSchema.map((x) => `${x.name}:${x.type}${x.required ? "" : "?"}`).join(", ");
@@ -145,12 +151,50 @@ switch (cmd) {
   }
   case "resolve": {
     const name = args.join(" ").trim();
-    if (!name) fail("resolve needs a skill name, e.g. resolve web-research");
+    if (!name) fail("resolve needs a skill name, e.g. resolve search");
     const agent = load(file);
     if (!agent.get(name)) fail(`no such skill: ${name}`);
     const chain = agent.resolve(name);
     console.log(`${name} loads ${chain.length} plane(s):`);
     for (const s of chain) console.log(`  - ${s.name}${s.deps.length ? `  (-> ${s.deps.join(",")})` : ""}`);
+    break;
+  }
+  case "run": {
+    const exec = args.includes("--exec");
+    const values: Record<string, string> = Object.create(null);
+    const words: string[] = [];
+    for (const a of args) {
+      if (a === "--exec") continue;
+      const kv = a.match(/^([a-zA-Z_]\w*)=([\s\S]*)$/);
+      if (kv) values[kv[1]] = kv[2];
+      else words.push(a);
+    }
+    const text = words.join(" ").trim();
+    if (!text) fail('run needs a request, e.g. run "find every TODO" pattern=TODO path=src');
+    const agent = load(file);
+    const ranked = agent.route(text);
+    if (!ranked.length) { console.log(`no skill matched: "${text}"`); break; }
+    const top = ranked[0].skill;
+    console.log(`request: "${text}"`);
+    console.log(`  -> ${top.name}  (matched: ${ranked[0].hits.join(", ")})`);
+    const chain = agent.resolve(top.name).map((s) => s.name);
+    if (chain.length > 1) console.log(`  loads: ${chain.join(" + ")}`);
+    if (!top.tool) {
+      console.log(`  (no command bound; this skill is guidance only)\n`);
+      console.log(top.body);
+      break;
+    }
+    const missing = commandPlaceholders(top.tool).filter((p) => !(p in values));
+    const command = agent.command(top.name, values)!;
+    console.log(`  command: ${command}`);
+    if (missing.length) console.log(`  fill:    ${missing.map((m) => `${m}=`).join(" ")}`);
+    if (exec) {
+      if (missing.length) fail(`cannot --exec: missing values for ${missing.join(", ")}`);
+      console.log(`  --- exec ---`);
+      const { spawnSync } = await import("node:child_process");
+      const r = spawnSync(command, { shell: true, stdio: "inherit" });
+      process.exit(r.status ?? 1);
+    }
     break;
   }
   default:

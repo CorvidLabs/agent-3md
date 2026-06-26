@@ -53,7 +53,7 @@ const TOOLS = [
     description: "Fetch one skill's full instructions by name (progressive disclosure: load only this plane).",
     inputSchema: {
       type: "object",
-      properties: { name: { type: "string", description: "the skill name, e.g. sql-query" } },
+      properties: { name: { type: "string", description: "the skill name, e.g. search" } },
       required: ["name"], additionalProperties: false,
     },
   },

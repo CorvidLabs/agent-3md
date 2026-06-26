@@ -2,34 +2,34 @@
 
 An orchestrator drives the `agent.3md` MCP server (`src/mcp.ts`) over stdio.
 For each request it calls `route_skill` to pick a skill, `get_skill` to load
-only that skill's plane, then executes it with a real handler. `sql-query` runs
-a live query against an in-memory database; `summarize` runs for real.
+only that skill's plane, then fills the skill's bound command template with typed
+inputs to produce the exact command that would run. Nothing is executed here;
+`bun run src/cli.ts run ... --exec` is what actually runs a command.
 
 Run it: `bun src/integration-demo.ts`
 
 ```
-agent.3md  x  MCP  -  route -> load -> execute (all over the MCP round-trip)
+agent.3md  x  MCP  -  route -> load -> fill -> command (over the MCP round-trip)
 ====================================================================
-connected: agent-3md:Atlas  (proto 2024-11-05)
+connected: agent-3md:dev  (proto 2024-11-05)
 
-> what rows in the orders table have a null total?
-  MCP route_skill  -> sql-query  (score 2; matched: rows, table)
-  MCP get_skill sql-query  -> loaded 61 tokens (only this plane)
-  EXECUTE sql-query  -> SELECT id,customer,total FROM orders WHERE total IS NULL  ->  [{"id":2,"customer":"Sol","total":null},{"id":4,"customer":"Vex","total":null}]
+> find every TODO in src
+  MCP route_skill  -> search  (score 1; matched: find)
+  MCP get_skill search  -> loaded 38 tokens (only this plane)
+  FILL search  -> rg --line-number 'TODO' 'src'
 
-> summarize this for me
-  MCP route_skill  -> summarize  (score 1; matched: summarize)
-  MCP get_skill summarize  -> loaded 39 tokens (only this plane)
-  EXECUTE summarize  -> 3md is a plain-text format that adds one named Z axis to Markdown.
-  - A document is a stack of planes along that axis.
-  - The same file is human-readable and machine-queryable.
+> parse the version field from package.json
+  MCP route_skill  -> json  (score 3; matched: json, field, parse)
+  MCP get_skill json  -> loaded 29 tokens (only this plane)
+  FILL json  -> jq '.version' 'package.json'
 
-> review my diff before the PR
-  MCP route_skill  -> code-review  (score 3; matched: review, diff, pr)
-  MCP get_skill code-review  -> loaded 68 tokens (only this plane)
-  EXECUTE code-review  -> [stub] would review the diff for correctness/security/style (tools: fs)
+> show the open prs
+  MCP route_skill  -> pr  (score 1; matched: open prs)
+  MCP get_skill pr  -> loaded 35 tokens (only this plane)
+  FILL pr  -> gh pr list --state 'open'
 
 ====================================================================
 Every turn: the agent.3md MCP server chose the skill and served only its
-plane; the orchestrator executed it. The SQL result above is a live query.
+plane; the runner filled its bound command. Nothing ran; the commands above
+are the exact strings `bun run src/cli.ts run ... --exec` would execute.
 ```

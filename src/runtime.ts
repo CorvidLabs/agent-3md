@@ -18,10 +18,29 @@ export interface Skill {
   readonly triggers: string[];
   readonly inputs: string[];        // input names in declared order (back-compatible with the bare CSV form)
   readonly inputSchema: SkillInput[]; // the typed inputs parsed from `inputs="name:type?"`
-  readonly tool: string | null;     // the tool / function this skill drives, from `tool=` (null if unbound)
+  readonly tool: string | null;     // the command this skill drives, from `tool=` (a template; null if unbound)
+  readonly binary: string | null;   // the first token of `tool` (the executable), e.g. "rg"
   readonly cost: string | null;
   readonly deps: number[];      // z indices of [[z=N]] / [[z=N|label]] links in the body
   readonly body: string;
+}
+
+// A `tool=` command may contain `{input}` placeholders that name the skill's
+// typed inputs, e.g. `rg --line-number {pattern} {path}`. fillCommand swaps each
+// placeholder for a shell-quoted value; unprovided placeholders are left visible
+// so a caller can see what still needs filling.
+const PLACEHOLDER_RE = /\{([a-zA-Z_]\w*)\}/g;
+const shQuote = (s: string): string => `'${s.replace(/'/g, `'\\''`)}'`;
+
+/** The placeholder names referenced by a command template, in order, de-duplicated. */
+export function commandPlaceholders(template: string): string[] {
+  return [...new Set([...template.matchAll(PLACEHOLDER_RE)].map((m) => m[1]))];
+}
+
+/** Fill a command template's `{input}` placeholders from `values` (shell-quoted). */
+export function fillCommand(template: string, values: Record<string, string> = {}): string {
+  return template.replace(PLACEHOLDER_RE, (whole, name) =>
+    Object.prototype.hasOwnProperty.call(values, name) ? shQuote(values[name]) : whole);
 }
 
 // A dependency / cross-plane link: `[[z=N]]` or `[[z=N|label]]`. One grammar,
@@ -72,13 +91,15 @@ export class Agent {
     for (const p of this.doc.planes) {
       if (p === identity) continue;
       const inputSchema = parseInputs(p.attributes.inputs);
+      const tool = p.attributes.tool?.trim() || null;
       const skill: Skill = {
         z: p.z,
         name: p.label ?? `skill-${p.z}`,
         triggers: csv(p.attributes.triggers),
         inputs: inputSchema.map((x) => x.name),
         inputSchema,
-        tool: p.attributes.tool?.trim() || null,
+        tool,
+        binary: tool ? tool.split(/\s+/)[0] : null,
         cost: p.attributes.cost ?? null,
         deps: [...p.body.matchAll(LINK_RE)].map((m) => Number(m[1])),
         body: p.body,
@@ -137,5 +158,15 @@ export class Agent {
     };
     visit(start);
     return out;
+  }
+
+  /**
+   * The runnable command for a skill, with `{input}` placeholders filled from
+   * `values` (shell-quoted). Returns null if the skill has no `tool`. Any
+   * placeholder without a value is left visible so the caller sees what to fill.
+   */
+  command(nameOrZ: string | number, values: Record<string, string> = {}): string | null {
+    const s = this.get(nameOrZ);
+    return s?.tool ? fillCommand(s.tool, values) : null;
   }
 }

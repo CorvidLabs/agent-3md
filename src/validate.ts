@@ -33,9 +33,9 @@ export function validateAgent(src: string): Report {
     return { ok: false, errors: [{ level: "error", rule: "parse", message: `not valid 3md: ${e?.message ?? e}` }], warnings: [] };
   }
 
-  // --- required frontmatter: 3md, model, and (title or agent) ---
+  // --- required frontmatter: just `3md` and a name. `model` is an optional
+  //     hint the host may override, so it is not required. ---
   if (!doc.version) err("frontmatter", "missing `3md:` version line");
-  if (!doc.metadata.model) err("frontmatter", "missing required `model:` frontmatter");
   if (!doc.title && !doc.metadata.agent) err("frontmatter", "need a `title:` or `agent:` to name the agent");
 
   // --- identity plane: exactly one explicit `kind=identity`, or (fallback) the
@@ -127,8 +127,41 @@ export function validateAgent(src: string): Report {
       }
     }
     // A tool binding (`tool=`) is optional, but if present it MUST be non-empty.
-    if (s.attributes.tool !== undefined && !s.attributes.tool.trim()) {
-      warn("tool", `skill "${s.label ?? `skill-${s.z}`}" has an empty tool binding`, s.z);
+    const sname = s.label ?? `skill-${s.z}`;
+    const tool = (s.attributes.tool ?? "").trim();
+    if (s.attributes.tool !== undefined && !tool) {
+      warn("tool", `skill "${sname}" has an empty tool binding`, s.z);
+    }
+    // Command templates tie the binding to the inputs: every `{placeholder}` in
+    // `tool` MUST be a declared input, and a declared input the command never
+    // uses is a likely mistake (warning).
+    if (tool) {
+      const used = new Set<string>();
+      for (const m of tool.matchAll(/\{([a-zA-Z_]\w*)\}/g)) {
+        used.add(m[1]);
+        if (!names.has(m[1])) {
+          err("tool-input", `skill "${sname}" command references {${m[1]}}, which is not a declared input`, s.z);
+        }
+      }
+      for (const n of names) {
+        if (!used.has(n)) warn("unused-input", `skill "${sname}" declares input "${n}" that its command never uses`, s.z);
+      }
+    }
+  }
+
+  // --- honest manifest: a skill's binary SHOULD be listed in frontmatter
+  //     `tools` (when `tools` is declared), so the manifest does not lie about
+  //     what the agent runs. ---
+  const declaredTools = (doc.metadata.tools ?? "").split(",").map((t) => t.trim()).filter(Boolean);
+  if (declaredTools.length) {
+    const declared = new Set(declaredTools);
+    for (const s of skills) {
+      const tool = (s.attributes.tool ?? "").trim();
+      if (!tool) continue;
+      const binary = tool.split(/\s+/)[0];
+      if (!declared.has(binary)) {
+        warn("undeclared-tool", `skill "${s.label ?? `skill-${s.z}`}" runs "${binary}", which is not in the agent's tools list`, s.z);
+      }
     }
   }
 

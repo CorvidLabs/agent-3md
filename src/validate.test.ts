@@ -74,3 +74,26 @@ test("a duplicate input name is caught by the dup-input rule", () => {
   expect(r.ok).toBe(false);
   expect(rules(r)).toContain("dup-input");
 });
+
+test("a command-backed skill is valid when placeholders match inputs", () => {
+  const r = validateAgent(read("../examples/conformance/valid-command.3md"));
+  expect(r.errors).toEqual([]);
+  expect(r.ok).toBe(true);
+});
+
+test("a command placeholder with no matching input is caught by tool-input", () => {
+  const r = validateAgent(read("../examples/conformance/invalid-bad-placeholder.3md"));
+  expect(r.ok).toBe(false);
+  expect(rules(r)).toContain("tool-input");
+});
+
+test("a missing agent name is caught by the frontmatter rule", () => {
+  const r = validateAgent(read("../examples/conformance/invalid-missing-frontmatter.3md"));
+  expect(r.ok).toBe(false);
+  expect(rules(r)).toContain("frontmatter");
+});
+
+test("model is optional (an agent with no model still validates)", () => {
+  const r = validateAgent(read("../agent.3md"));
+  expect(r.ok).toBe(true);
+});
