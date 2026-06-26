@@ -65,16 +65,17 @@ A skill plane is `@plane z=N label="<name>" kind=skill` plus these attributes:
 
 | Attribute | Meaning |
 |-----------|---------|
-| `triggers` | Comma-separated phrases that route a request to this skill. Each phrase is matched word-wise (case-insensitive). |
+| `triggers` | Comma-separated trigger phrases. A phrase matches a request when **every** word in the phrase appears in the request (case-insensitive). So `look up` matches only when both `look` and `up` are present, never on `up` alone. |
 | `inputs` | Comma-separated names of the data this skill expects. |
 | `cost` | Optional tag for side-effect / resource class (e.g. `net`, `db`). |
 
 The plane **body** is the skill's instructions, the prompt the agent loads when
 the skill is selected.
 
-**Dependencies** are expressed as 3md cross-plane links in the body:
-`[[z=N|label]]` declares that this skill depends on the skill at plane `N`. A
-loader resolves these transitively so a skill arrives with everything it needs.
+**Dependencies** are expressed as 3md cross-plane links in the body, in either
+form: `[[z=N]]` or `[[z=N|label]]`. Both declare that this skill depends on the
+skill at plane `N`. A loader resolves these transitively so a skill arrives with
+everything it needs.
 
 Example skill plane:
 
@@ -100,9 +101,9 @@ reference implementation):
 | Operation | Returns |
 |-----------|---------|
 | `manifest()` | The agent name, model, tools, persona, the identity body, and a **body-less** catalog of skills (`name`, `z`, `triggers`, `cost`). |
-| `route(text)` | Skills ranked by how many of their trigger words appear in `text`, best first, with the matched words. |
+| `route(text)` | Skills whose triggers `text` satisfies, ranked by the number of **distinct trigger phrases matched** (best first), ties broken by lower `z`; each result carries the matched phrases. Tokens are maximal runs of Unicode letters/digits, lowercased. No match returns an empty list. |
 | `get(name \| z)` | A single skill including its full body. O(1). |
-| `resolve(name \| z)` | The skill plus its transitive dependency chain (following `[[z=N]]` links), each skill once, dependency-complete. |
+| `resolve(name \| z)` | The skill plus its transitive dependency chain (following `[[z=N]]` / `[[z=N|label]]` links), each skill once, dependency-complete. |
 
 The intended loop is **route → load → execute**: route the request, load only
 the resolved skill chain, run it. `manifest()` is cheap to keep resident;
@@ -119,8 +120,9 @@ A document is a conforming `agent3md/1` agent if:
 - **MUST** have exactly one identity plane (explicit `kind=identity`, or the
   first plane by the fallback rule). All other planes are skills.
 - **MUST** give every skill a unique, non-empty name (`label`).
-- **MUST** ensure every `[[z=N|...]]` link targets an existing plane.
-- **MUST**, if `entry` is set, have it resolve to an existing plane.
+- **MUST** ensure every `[[z=N]]` or `[[z=N|label]]` link targets an existing plane.
+- **MUST NOT** contain dependency cycles (`[[z=N]]` chains that form a loop).
+- **MUST**, if `entry` is set, have it be a plane `z` (an integer) that exists.
 - **SHOULD** give every skill a non-empty `triggers` list (a skill with no
   triggers is reachable only by name/`z`, never by `route()`).
 - **SHOULD** keep skill bodies self-contained so a single skill can be loaded

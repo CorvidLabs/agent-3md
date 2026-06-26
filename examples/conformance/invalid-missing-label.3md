@@ -1,0 +1,12 @@
+---
+3md: 1.0
+title: NoLabel
+model: claude-opus-4-8
+---
+@plane z=0 label="NoLabel" kind=identity
+# NoLabel
+Identity.
+
+@plane z=1 kind=skill triggers="x"
+# Skill with no label
+This skill has no `label=` attribute, so it has no name. RULE: missing-label.

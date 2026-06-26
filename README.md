@@ -1,4 +1,4 @@
-# agent.3md — a standard for agents in one file
+# agent.3md: a format for agents in one file
 
 **One plain-text 3md file is a whole agent.** Plane 0 is the agent (identity,
 rules); every other plane is a skill. The frontmatter is the manifest, each
@@ -12,11 +12,13 @@ instead of stuffing every skill into context.
 
 ## Quickstart (2 minutes)
 
-**Use the library.** It's on GitHub Packages, so point the `@corvidlabs` scope at
-that registry (with an auth token), then install:
+**Use the library.** It's on GitHub Packages. That registry needs a token even
+for public packages, so create a classic personal access token with the
+`read:packages` scope, then point the `@corvidlabs` scope at the registry and
+install:
 
 ```sh
-echo "@corvidlabs:registry=https://npm.pkg.github.com" >> .npmrc   # + an auth token line
+printf '@corvidlabs:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT\n' > .npmrc
 npm install @corvidlabs/agent3md
 ```
 
@@ -43,19 +45,25 @@ bun run mcp my-agent.3md              # serve its skills to any MCP client
 
 ## Why it's good for agents
 
-- **Progressive disclosure.** At 100 skills, loading only the routed skill uses
-  **~83% fewer tokens/turn (1420 vs 8300)** (`bun run scale`). And with the
-  catalog queried out-of-context (route as a tool), per-turn cost goes **flat**:
-  **~94 tokens whether the agent has 10 skills or 100** (`bun run scale2`) — so
-  one agent file can hold thousands of skills with no per-turn context growth.
+- **Progressive disclosure.** The agent loads only the one skill a request needs,
+  not all of them. On the real 6-skill example that is about **64% fewer tokens
+  per turn at 100% routing accuracy** (`bun run benchmark`). With realistic
+  ~300-token skills, loading one instead of dumping the whole file is about **96%
+  fewer per turn at 100 skills** (`bun run scale`). Routing accuracy depends on
+  writing distinct triggers, and the benchmark measures it, it is not assumed.
+- **Flat at scale, honestly.** Move the catalog out of the prompt and query it
+  with a routing tool, and per-turn in-context cost stays roughly flat (about
+  **520 tokens whether the agent has 10 skills or 100**, `bun run scale2`). That
+  is not free: it costs a tool round-trip per turn plus a catalog that lives in
+  the loader, but it decouples per-turn prompt size from skill count.
 - **One artifact, two readers.** Read it as docs; parse it as an index.
 - **Portable, proven.** The same `agent.3md` loads and routes identically in
   **TypeScript, Rust, and Swift** (`loaders/`), each on the canonical 3md parser.
   Plus a JSON projection (`bun run export`) for non-3md consumers.
 - **Checkable.** A conformance validator + a language-agnostic vector set
-  (`examples/conformance/`) make it a real standard, not a vibe.
+  (`examples/conformance/`) make it checkable, not a vibe.
 
-## The standard
+## The spec
 
 [`SPEC.md`](./SPEC.md) defines **agent3md/1**: manifest frontmatter, the one
 identity plane vs skill planes, the skill contract (triggers / inputs / cost /
@@ -67,7 +75,7 @@ dependency links), the loader contract (`manifest` / `route` / `get` /
 | file | what |
 |---|---|
 | `agent.3md` | the example agent (Atlas): identity + 6 skills |
-| `SPEC.md` | the agent3md/1 standard |
+| `SPEC.md` | the agent3md/1 spec |
 | `src/threemd.ts` | the canonical 3md parser (vendored) |
 | `src/runtime.ts` | reference loader: `manifest / route / get / resolve` |
 | `src/validate.ts` | conformance validator (+ `examples/invalid/` fixtures) |
@@ -75,7 +83,7 @@ dependency links), the loader contract (`manifest` / `route` / `get` /
 | `src/mcp.ts` | MCP server: exposes an agent's skills as MCP tools |
 | `src/export.ts` | JSON manifest projection (`agent3md/1`) for any consumer |
 | `loaders/rust`, `loaders/swift` | the same agent loaded via the Rust + Swift parsers |
-| `examples/agents/` | more agents (devops, support) — proves generality |
+| `examples/agents/` | more agents (devops, support); proves generality |
 | `examples/conformance/` | labeled valid/invalid vectors for any implementation |
 | `src/benchmark.ts`, `src/scale/` | token-savings proof, single + scaled + flat |
 
@@ -103,7 +111,10 @@ Point an MCP-capable agent at the server; its skills appear as tools
 
 ## Status
 
-v1 standard kit: spec, reference loader (TS) plus **Rust and Swift loaders**, a
-validator + conformance vectors, CLI, MCP server, JSON projection, and flat
-scaling. Roadmap: typed skill inputs and tool bindings so a skill body can
-declare the tool it drives, plus publishing the spec. See `SPEC.md` §future.
+Early (v0.x), a working reference kit, not a finished product: the spec, loaders
+in TypeScript, Rust, and Swift, a validator with conformance vectors, a CLI, an
+MCP server, and a JSON projection. It is a proposed format with no external users
+yet, so treat it as a proof of concept you can build on. It was put through an
+adversarial review; see [`docs/ROADMAP-1.0.md`](./docs/ROADMAP-1.0.md) for the
+findings and what 1.0.0 needs (crates.io publish to drop Rust vendoring, typed
+skill inputs, tool bindings, and real adopters).

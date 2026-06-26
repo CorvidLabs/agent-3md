@@ -23,8 +23,10 @@ private func csv(_ value: String?) -> [String] {
     return value.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
 }
 
+// Dependency links: `[[z=N]]` or `[[z=N|label]]`. One grammar, shared with the
+// TS runtime, the validator, the spec, and the Rust loader.
 private func depLinks(in body: String) -> [Int] {
-    guard let re = try? NSRegularExpression(pattern: "\\[\\[z=(\\d+)\\|") else { return [] }
+    guard let re = try? NSRegularExpression(pattern: "\\[\\[z=(\\d+)(?:\\|[^\\]]*)?\\]\\]") else { return [] }
     let range = NSRange(body.startIndex..., in: body)
     return re.matches(in: body, range: range).compactMap { m in
         guard let r = Range(m.range(at: 1), in: body) else { return nil }
@@ -32,8 +34,10 @@ private func depLinks(in body: String) -> [Int] {
     }
 }
 
-private func triggerWords(_ triggers: [String]) -> Set<String> {
-    Set(triggers.flatMap { $0.lowercased().split(whereSeparator: { !$0.isLetter }).map(String.init) })
+// Tokenize for routing: maximal runs of Unicode letters/digits, lowercased.
+// Identical to the TS and Rust loaders so routing never diverges.
+private func tokenize(_ s: String) -> [String] {
+    s.lowercased().split(whereSeparator: { !($0.isLetter || $0.isNumber) }).map(String.init)
 }
 
 // MARK: - Agent
@@ -64,6 +68,12 @@ struct Agent {
             )
             if p.attributes["kind"] == "identity" { identity = skill } else { skills.append(skill) }
         }
+        // Fallback: if no plane is marked kind=identity, the first plane is it.
+        if identity == nil, let first = doc.planes.first {
+            let fz = Int(first.z)
+            identity = skills.first { $0.z == fz }
+            skills.removeAll { $0.z == fz }
+        }
         self.name = doc.title ?? doc.metadata["agent"] ?? "agent"
         self.model = doc.metadata["model"] ?? "unknown"
         self.tools = csv(doc.metadata["tools"])
@@ -75,14 +85,18 @@ struct Agent {
 
     func get(_ name: String) -> Skill? { byName[name] }
 
+    // Route by trigger-phrase coverage: a trigger phrase matches only when ALL
+    // of its words appear in the request. Score = matched phrases; ties by z.
     func route(_ text: String) -> [(skill: Skill, score: Int, hits: [String])] {
-        let words = text.lowercased().split(whereSeparator: { !$0.isLetter }).map(String.init)
+        let req = Set(tokenize(text))
         return skills.compactMap { skill -> (Skill, Int, [String])? in
-            let tw = triggerWords(skill.triggers)
-            let hits = Array(Set(words.filter { tw.contains($0) }))
+            let hits = skill.triggers.filter { t in
+                let tw = tokenize(t)
+                return !tw.isEmpty && tw.allSatisfy { req.contains($0) }
+            }
             return hits.isEmpty ? nil : (skill, hits.count, hits)
         }
-        .sorted { $0.1 > $1.1 }
+        .sorted { $0.2.count != $1.2.count ? $0.2.count > $1.2.count : $0.0.z < $1.0.z }
         .map { ($0.0, $0.1, $0.2) }
     }
 
@@ -101,6 +115,19 @@ struct Agent {
 }
 
 // MARK: - Run
+
+// Optional CLI for parity checks: `swift run Agent3MD route <file> <text...>`.
+let cliArgs = Array(CommandLine.arguments.dropFirst())
+if cliArgs.first == "route", cliArgs.count >= 3 {
+    let src = try String(contentsOfFile: cliArgs[1], encoding: .utf8)
+    let probe = try Agent(source: src)
+    if let top = probe.route(cliArgs[2...].joined(separator: " ")).first {
+        print("\(top.skill.name) score=\(top.score) hits=[\(top.hits.joined(separator: ","))]")
+    } else {
+        print("(none)")
+    }
+    exit(0)
+}
 
 // Resolve agent.3md relative to this source file (../../../../agent.3md), so it
 // works regardless of the current working directory.
@@ -127,7 +154,7 @@ print(String(repeating: "=", count: 60))
 let request = "review my diff before the PR"
 print("\nroute(\"\(request)\"):")
 if let top = agent.route(request).first {
-    print("  -> \(top.skill.name)  (matched: \(top.hits.sorted().joined(separator: ", ")))")
+    print("  -> \(top.skill.name)  (matched: \(top.hits.joined(separator: ", ")))")
     let chain = agent.resolve(top.skill.name).map(\.name).joined(separator: " + ")
     print("  loads: \(chain)")
 }

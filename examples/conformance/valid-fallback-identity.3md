@@ -1,0 +1,13 @@
+---
+3md: 1.0
+title: Fallback
+model: claude-haiku-4-5
+---
+@plane z=0 label="Fallback"
+# Fallback
+No plane is marked kind=identity, so the first plane (lowest z) is the identity
+by the fallback rule. RULE: valid (fallback identity).
+
+@plane z=1 label="echo" kind=skill triggers="echo, repeat, say"
+# Skill: echo
+Repeat the input back to the user.

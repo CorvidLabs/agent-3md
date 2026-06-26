@@ -11,11 +11,9 @@ test("the real agent.3md passes validation", () => {
   expect(r.ok).toBe(true);
 });
 
-test("no-identity fixture is caught by the identity rule", () => {
-  const r = validateAgent(read("../examples/invalid/no-identity.3md"));
-  expect(r.ok).toBe(false);
-  expect(rules(r)).toContain("identity");
-});
+// Note: a document with no `kind=identity` is VALID (the first plane is the
+// identity by fallback). See conformance/valid-fallback-identity.3md. The
+// identity rule only errors on >1 explicit identity (invalid-two-identities).
 
 test("dead-link fixture is caught by the dead-link rule", () => {
   const r = validateAgent(read("../examples/invalid/dead-link.3md"));
@@ -27,4 +25,34 @@ test("dup-skill fixture is caught by the unique-skill rule", () => {
   const r = validateAgent(read("../examples/invalid/dup-skill.3md"));
   expect(r.ok).toBe(false);
   expect(rules(r)).toContain("unique-skill");
+});
+
+test("fallback identity (no kind=identity) is valid", () => {
+  const r = validateAgent(read("../examples/conformance/valid-fallback-identity.3md"));
+  expect(r.errors).toEqual([]);
+  expect(r.ok).toBe(true);
+});
+
+test("missing-label fixture is caught", () => {
+  const r = validateAgent(read("../examples/conformance/invalid-missing-label.3md"));
+  expect(r.ok).toBe(false);
+  expect(rules(r)).toContain("missing-label");
+});
+
+test("dependency cycle is caught", () => {
+  const r = validateAgent(read("../examples/conformance/invalid-cycle.3md"));
+  expect(r.ok).toBe(false);
+  expect(rules(r)).toContain("cycle");
+});
+
+test("two-identities fixture is caught by the identity rule", () => {
+  const r = validateAgent(read("../examples/conformance/invalid-two-identities.3md"));
+  expect(r.ok).toBe(false);
+  expect(rules(r)).toContain("identity");
+});
+
+test("bad-entry fixture is caught by the entry rule", () => {
+  const r = validateAgent(read("../examples/conformance/invalid-bad-entry.3md"));
+  expect(r.ok).toBe(false);
+  expect(rules(r)).toContain("entry");
 });

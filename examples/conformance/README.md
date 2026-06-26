@@ -15,17 +15,19 @@ Reference check (this repo): `bun run src/validate.ts examples/conformance/<file
 | `valid-deps.3md` | skills with `[[z=N]]` dependency links to real planes |
 | `valid-cost.3md` | optional `cost=` tags and `inputs=` on skills |
 | `valid-entry.3md` | `entry:` frontmatter resolving to a real plane |
+| `valid-fallback-identity.3md` | no `kind=identity`: the first plane is the identity by the fallback rule |
 
 ## Invalid (one rule each)
 
 | file | rule it must fail | why |
 |---|---|---|
-| `invalid-no-identity.3md` | `identity` | no plane marked `kind=identity` |
 | `invalid-two-identities.3md` | `identity` | more than one identity plane |
+| `invalid-missing-label.3md` | `missing-label` | a skill plane has no `label` |
 | `invalid-dup-skill.3md` | `unique-skill` | two skills share a label |
 | `invalid-dead-link.3md` | `dead-link` | `[[z=42]]` targets a non-existent plane |
+| `invalid-cycle.3md` | `cycle` | a `[[z=N]]` dependency chain forms a loop |
 | `invalid-missing-frontmatter.3md` | `frontmatter` | missing required `model:` |
-| `invalid-bad-entry.3md` | `entry` | `entry:` points at a plane that does not exist |
+| `invalid-bad-entry.3md` | `entry` | `entry:` is not a real plane `z` |
 
 Each invalid file violates exactly one rule and is otherwise conforming, so a
 correct validator should report that rule (and only that rule) as the error.
