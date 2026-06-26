@@ -50,11 +50,14 @@ taking them on faith. This doc records what they found, what is fixed, and what
   v0.1.0): `cargo install agent3md` gives a single fast binary with no runtime,
   the default for the command line. TypeScript stays the reference library that
   carries the spec, validator, and MCP server.
+- **Typed inputs and per-skill tool bindings** (additive): a skill declares
+  typed inputs (`name:type?`, a closed type set) and the concrete tool it drives
+  (`tool="db.query"`). Parsed and validated identically in the TypeScript, Rust,
+  and Swift loaders, with new conformance vectors. The old untyped form stays
+  valid, so this does not break `agent3md/1`.
 
 ## Still needed for 1.0.0
 
 - A cleaner install path (public npm registry, or keep GitHub Packages but make
-  the token step truly one command).
-- Typed skill `inputs` and tool bindings, so a skill body can declare the tool
-  it drives (`SPEC.md` §future).
+  the token step truly one command). Blocked on CorvidLabs npm org access.
 - Real external adopters. Until then this is a proposed format, not a standard.
