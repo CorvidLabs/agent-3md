@@ -1,0 +1,15 @@
+{
+  "originHash" : "aac55c5f5e1763a2c1cc2bd3accf634518415e259e99fda8612bd17aaa47e865",
+  "pins" : [
+    {
+      "identity" : "3md",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/CorvidLabs/3md.git",
+      "state" : {
+        "revision" : "da48e5f781a25196d49bf617dc9c67de97fa9bdb",
+        "version" : "1.7.17"
+      }
+    }
+  ],
+  "version" : 3
+}

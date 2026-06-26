@@ -5,7 +5,7 @@
 //
 // `file` is optional and defaults to the project's ../agent.3md. A file is
 // recognized when the argument exists on disk or ends in `.3md`.
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { Agent } from "./runtime";
 
@@ -17,6 +17,7 @@ usage:
   bun run src/cli.ts <command> [file] [args]
 
 commands:
+  new      <name> [outfile]  scaffold a new valid agent.3md (default <name>.3md)
   manifest [file]            agent name/model/tools + skill catalog (no bodies)
   skills   [file]            just the skill names
   route    [file] <text>     rank skills matching the request + the load chain
@@ -49,6 +50,49 @@ function load(file: string): Agent {
 
 const [cmd, ...rest] = process.argv.slice(2);
 if (!cmd || cmd === "help" || cmd === "-h" || cmd === "--help") { console.log(USAGE); process.exit(0); }
+
+// `new` writes a fresh agent rather than loading one, so handle it before the
+// file-loading path. Usage: new <name> [outfile]
+if (cmd === "new") {
+  const name = rest[0];
+  if (!name) fail("new needs a name, e.g. new my-agent");
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "agent";
+  const outfile = rest[1] ?? `${slug}.3md`;
+  if (existsSync(outfile)) fail(`refusing to overwrite existing file: ${outfile}`);
+  const scaffold = `---
+3md: 1.0
+axis: skill
+title: ${name}
+agent: ${slug}
+model: claude-opus-4-8
+---
+${name} is an agent packaged as one 3md file: plane 0 is the agent, every other
+plane is a skill, loaded on demand. Edit the skills below or add @plane skills.
+
+@plane z=0 label="${name}" kind=identity
+# ${name}
+
+Operating rules. Route each task to the skill whose triggers match, load that
+plane only, then follow its dependency links.
+
+@plane z=1 label="search" kind=skill triggers="search, find, look up, latest" inputs="query"
+# Skill: search
+
+Find information for a request, then pair the findings with [[z=2|summarize]].
+
+@plane z=2 label="summarize" kind=skill triggers="summarize, tldr, condense, brief" inputs="text"
+# Skill: summarize
+
+Condense text: lead with the one-sentence answer, then the load-bearing points.
+`;
+  writeFileSync(outfile, scaffold);
+  console.log(`wrote ${outfile}`);
+  console.log(`next:`);
+  console.log(`  bun run src/validate.ts ${outfile}                 # check it conforms`);
+  console.log(`  bun run src/cli.ts route ${outfile} "find the latest notes"`);
+  console.log(`  bun run src/mcp.ts ${outfile}                      # serve its skills over MCP`);
+  process.exit(0);
+}
 
 const { file, rest: args } = splitFile(rest);
 

@@ -10,6 +10,37 @@ index, so the two can never drift. And because skills are addressable planes, an
 agent loads **only the one skill it needs** per turn (progressive disclosure)
 instead of stuffing every skill into context.
 
+## Quickstart (2 minutes)
+
+**Use the library.** It's on GitHub Packages, so point the `@corvidlabs` scope at
+that registry (with an auth token), then install:
+
+```sh
+echo "@corvidlabs:registry=https://npm.pkg.github.com" >> .npmrc   # + an auth token line
+npm install @corvidlabs/agent3md
+```
+
+```ts
+import { Agent, validateAgent } from "@corvidlabs/agent3md";
+import { readFileSync } from "node:fs";
+
+const src = readFileSync("agent.3md", "utf8");
+console.log(validateAgent(src).ok);                  // true
+const agent = new Agent(src);
+console.log(agent.route("summarize this")[0].skill.name);  // -> "summarize"
+const skill = agent.get("summarize");                // load ONE skill on demand
+```
+
+**Or scaffold and drive it from this repo:**
+
+```sh
+git clone https://github.com/CorvidLabs/agent-3md && cd agent-3md
+bun run cli new my-agent              # writes a valid starter my-agent.3md
+bun run validate my-agent.3md         # PASS
+bun run cli route my-agent.3md "find the latest release notes"
+bun run mcp my-agent.3md              # serve its skills to any MCP client
+```
+
 ## Why it's good for agents
 
 - **Progressive disclosure.** At 100 skills, loading only the routed skill uses
