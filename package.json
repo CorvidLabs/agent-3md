@@ -26,9 +26,7 @@
     "agent.3md",
     "README.md"
   ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
+  "publishConfig": { "access": "public" },
   "scripts": {
     "build": "bun build src/index.ts --outdir dist --target node --format esm && tsc -p tsconfig.build.json",
     "prepublishOnly": "bun run build",
