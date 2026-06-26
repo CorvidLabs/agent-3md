@@ -1,0 +1,13 @@
+---
+3md: 1.0
+title: BadType
+model: claude-opus-4-8
+---
+@plane z=0 label="BadType" kind=identity
+# BadType
+Identity.
+
+@plane z=1 label="s" kind=skill triggers="x" inputs="count:int"
+# Skill: s
+"int" is not a canonical input type (use string/number/boolean/object/array).
+RULE: input-type.

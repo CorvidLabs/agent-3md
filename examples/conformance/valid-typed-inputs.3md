@@ -1,0 +1,14 @@
+---
+3md: 1.0
+title: Typed
+model: claude-opus-4-8
+---
+@plane z=0 label="Typed" kind=identity
+# Typed
+Identity.
+
+@plane z=1 label="query" kind=skill triggers="ask, lookup" inputs="question:string, limit:number?" tool="db.query"
+# Skill: query
+Typed inputs (a required string and an optional number) plus a tool binding.
+RULE: valid. A bare name still means a required string, so this stays
+backward-compatible with the older untyped form.

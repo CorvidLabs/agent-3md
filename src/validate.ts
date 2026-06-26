@@ -106,6 +106,32 @@ export function validateAgent(src: string): Report {
     if (!triggers) warn("triggers", `skill "${s.label ?? `skill-${s.z}`}" has no triggers; it can never be routed to`, s.z);
   }
 
+  // --- typed inputs + tool bindings (agent3md/1, additive) ---
+  // An input item is `name`, `name:type`, or `name:type?` (trailing `?` =
+  // optional). A bare name is a required string. Types are a closed set.
+  const INPUT_TYPES = new Set(["string", "number", "boolean", "object", "array"]);
+  for (const s of skills) {
+    const items = (s.attributes.inputs ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+    const names = new Set<string>();
+    for (const item of items) {
+      let body = item;
+      if (body.endsWith("?")) body = body.slice(0, -1).trimEnd();
+      const i = body.indexOf(":");
+      const name = (i === -1 ? body : body.slice(0, i)).trim();
+      const type = (i === -1 ? "string" : body.slice(i + 1).trim().toLowerCase()) || "string";
+      if (!name) continue;
+      if (names.has(name)) err("dup-input", `skill "${s.label ?? `skill-${s.z}`}" declares input "${name}" more than once`, s.z);
+      else names.add(name);
+      if (!INPUT_TYPES.has(type)) {
+        err("input-type", `input "${name}" has unknown type "${type}" (use one of: ${[...INPUT_TYPES].join(", ")})`, s.z);
+      }
+    }
+    // A tool binding (`tool=`) is optional, but if present it MUST be non-empty.
+    if (s.attributes.tool !== undefined && !s.attributes.tool.trim()) {
+      warn("tool", `skill "${s.label ?? `skill-${s.z}`}" has an empty tool binding`, s.z);
+    }
+  }
+
   return { ok: errors.length === 0, errors, warnings };
 }
 

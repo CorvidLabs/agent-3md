@@ -23,6 +23,8 @@ const skills = man.skills.map((s) => {
     z: full.z,
     triggers: full.triggers,
     inputs: full.inputs,
+    inputSchema: full.inputSchema,
+    tool: full.tool,
     cost: full.cost,
     deps: full.deps,
   };

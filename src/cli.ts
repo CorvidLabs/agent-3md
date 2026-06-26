@@ -133,7 +133,13 @@ switch (cmd) {
     if (!name) fail("get needs a skill name, e.g. get sql-query");
     const skill = load(file).get(name);
     if (!skill) fail(`no such skill: ${name}`);
-    console.log(`# ${skill.name}  (z=${skill.z}${skill.cost ? `, cost=${skill.cost}` : ""}${skill.inputs.length ? `, inputs=${skill.inputs.join("/")}` : ""})`);
+    const fmtInputs = skill.inputSchema.map((x) => `${x.name}:${x.type}${x.required ? "" : "?"}`).join(", ");
+    const meta = [
+      skill.cost ? `cost=${skill.cost}` : "",
+      skill.tool ? `tool=${skill.tool}` : "",
+      fmtInputs ? `inputs=${fmtInputs}` : "",
+    ].filter(Boolean).join(", ");
+    console.log(`# ${skill.name}  (z=${skill.z}${meta ? `, ${meta}` : ""})`);
     console.log(skill.body);
     break;
   }

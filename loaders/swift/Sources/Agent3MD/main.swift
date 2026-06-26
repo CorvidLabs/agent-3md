@@ -6,11 +6,19 @@ import ThreeMD
 
 // MARK: - Model
 
+struct SkillInput {
+    let name: String
+    let type: String
+    let required: Bool
+}
+
 struct Skill {
     let z: Int
     let name: String
     let triggers: [String]
-    let inputs: [String]
+    let inputs: [String]          // names (back-compatible with the bare CSV form)
+    let inputSchema: [SkillInput] // typed inputs parsed from `inputs="name:type?"`
+    let tool: String?             // the tool / function this skill drives, from `tool=`
     let cost: String?
     let deps: [Int]
     let body: String
@@ -21,6 +29,32 @@ struct Skill {
 private func csv(_ value: String?) -> [String] {
     guard let value else { return [] }
     return value.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+}
+
+// Parse a typed input list: `inputs="question, limit:number?"`. Each item is
+// `name`, `name:type`, or `name:type?` (a trailing `?` marks it optional). A
+// bare name is a required string. One grammar, shared with the TS and Rust
+// loaders so the typed contract never diverges.
+private func parseInputs(_ value: String?) -> [SkillInput] {
+    csv(value).compactMap { item -> SkillInput? in
+        var s = item
+        var required = true
+        if s.hasSuffix("?") {
+            required = false
+            s = String(s.dropLast()).trimmingCharacters(in: .whitespaces)
+        }
+        let name: String
+        let type: String
+        if let colon = s.firstIndex(of: ":") {
+            name = String(s[..<colon]).trimmingCharacters(in: .whitespaces)
+            let t = String(s[s.index(after: colon)...]).trimmingCharacters(in: .whitespaces).lowercased()
+            type = t.isEmpty ? "string" : t
+        } else {
+            name = s.trimmingCharacters(in: .whitespaces)
+            type = "string"
+        }
+        return name.isEmpty ? nil : SkillInput(name: name, type: type, required: required)
+    }
 }
 
 // Dependency links: `[[z=N]]` or `[[z=N|label]]`. One grammar, shared with the
@@ -57,11 +91,15 @@ struct Agent {
         var identity: Skill?
         for p in doc.planes {
             let z = Int(p.z)
+            let inputSchema = parseInputs(p.attributes["inputs"])
+            let tool = p.attributes["tool"]?.trimmingCharacters(in: .whitespaces)
             let skill = Skill(
                 z: z,
                 name: p.label ?? "skill-\(z)",
                 triggers: csv(p.attributes["triggers"]),
-                inputs: csv(p.attributes["inputs"]),
+                inputs: inputSchema.map(\.name),
+                inputSchema: inputSchema,
+                tool: (tool?.isEmpty ?? true) ? nil : tool,
                 cost: p.attributes["cost"],
                 deps: depLinks(in: p.body),
                 body: p.body
@@ -161,6 +199,8 @@ if let top = agent.route(request).first {
 
 print("\nget(\"sql-query\") (progressive disclosure, first 4 lines):")
 if let sql = agent.get("sql-query") {
+    let typed = sql.inputSchema.map { "\($0.name):\($0.type)\($0.required ? "" : "?")" }.joined(separator: ", ")
+    print("    tool=\(sql.tool ?? "(none)"), inputs=\(typed)")
     for line in sql.body.split(separator: "\n", omittingEmptySubsequences: false).prefix(4) {
         print("    \(line)")
     }

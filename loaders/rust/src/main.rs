@@ -9,11 +9,18 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::process::exit;
 use threemd::{parse, Document};
 
+struct SkillInput {
+    name: String,
+    type_: String,
+    required: bool,
+}
+
 struct Skill {
     z: i64,
     name: String,
     triggers: Vec<String>,
-    inputs: Vec<String>,
+    input_schema: Vec<SkillInput>,
+    tool: Option<String>,
     cost: Option<String>,
     deps: Vec<i64>,
     body: String,
@@ -27,6 +34,45 @@ fn csv(v: Option<&String>) -> Vec<String> {
             .collect()
     })
     .unwrap_or_default()
+}
+
+/// Parse a typed input list: `inputs="question, limit:number?"`. Each item is
+/// `name`, `name:type`, or `name:type?` (a trailing `?` marks it optional). A
+/// bare name is a required string. One grammar, shared with the TS and Swift
+/// loaders so the typed contract never diverges.
+fn parse_inputs(v: Option<&String>) -> Vec<SkillInput> {
+    csv(v)
+        .into_iter()
+        .filter_map(|item| {
+            let (s, required) = match item.strip_suffix('?') {
+                Some(rest) => (rest.trim_end().to_string(), false),
+                None => (item, true),
+            };
+            let (name, type_) = match s.find(':') {
+                Some(i) => {
+                    let t = s[i + 1..].trim().to_lowercase();
+                    (
+                        s[..i].trim().to_string(),
+                        if t.is_empty() {
+                            "string".to_string()
+                        } else {
+                            t
+                        },
+                    )
+                }
+                None => (s.trim().to_string(), "string".to_string()),
+            };
+            if name.is_empty() {
+                None
+            } else {
+                Some(SkillInput {
+                    name,
+                    type_,
+                    required,
+                })
+            }
+        })
+        .collect()
 }
 
 /// Pull dependency targets out of a plane body. One grammar, shared with the TS
@@ -88,11 +134,17 @@ fn build_skills(doc: &Document) -> Vec<Skill> {
         .filter(|p| Some(p.z as i64) != id)
         .map(|p| {
             let z = p.z as i64;
+            let input_schema = parse_inputs(p.attributes.get("inputs"));
             Skill {
                 z,
                 name: p.label.clone().unwrap_or_else(|| format!("skill-{z}")),
                 triggers: csv(p.attributes.get("triggers")),
-                inputs: csv(p.attributes.get("inputs")),
+                input_schema,
+                tool: p
+                    .attributes
+                    .get("tool")
+                    .map(|t| t.trim().to_string())
+                    .filter(|t| !t.is_empty()),
                 cost: p.attributes.get("cost").cloned(),
                 deps: parse_deps(&p.body),
                 body: p.body.clone(),
@@ -338,6 +390,48 @@ fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
         }
     }
 
+    // typed inputs + tool bindings (agent3md/1, additive): canonical types, no
+    // duplicate input names, and a non-empty tool binding if `tool=` is present.
+    let input_types = ["string", "number", "boolean", "object", "array"];
+    for p in doc.planes.iter().filter(is_skill) {
+        let z = p.z as i64;
+        let name = p.label.clone().unwrap_or_else(|| format!("skill-{z}"));
+        let mut seen: BTreeSet<String> = BTreeSet::new();
+        for inp in parse_inputs(p.attributes.get("inputs")) {
+            if !seen.insert(inp.name.clone()) {
+                err(
+                    "dup-input",
+                    format!(
+                        "skill \"{name}\" declares input \"{}\" more than once",
+                        inp.name
+                    ),
+                    Some(z),
+                );
+            }
+            if !input_types.contains(&inp.type_.as_str()) {
+                err(
+                    "input-type",
+                    format!(
+                        "input \"{}\" has unknown type \"{}\" (use one of: {})",
+                        inp.name,
+                        inp.type_,
+                        input_types.join(", ")
+                    ),
+                    Some(z),
+                );
+            }
+        }
+        if let Some(tool) = p.attributes.get("tool") {
+            if tool.trim().is_empty() {
+                warnings.push(Issue {
+                    rule: "tool",
+                    msg: format!("skill \"{name}\" has an empty tool binding"),
+                    z: Some(z),
+                });
+            }
+        }
+    }
+
     (errors, warnings)
 }
 
@@ -484,12 +578,29 @@ fn main() {
                         .as_ref()
                         .map(|c| format!(", cost={c}"))
                         .unwrap_or_default();
-                    let inputs = if s.inputs.is_empty() {
+                    let tool = s
+                        .tool
+                        .as_ref()
+                        .map(|t| format!(", tool={t}"))
+                        .unwrap_or_default();
+                    let inputs = if s.input_schema.is_empty() {
                         String::new()
                     } else {
-                        format!(", inputs={}", s.inputs.join("/"))
+                        let parts: Vec<String> = s
+                            .input_schema
+                            .iter()
+                            .map(|x| {
+                                format!(
+                                    "{}:{}{}",
+                                    x.name,
+                                    x.type_,
+                                    if x.required { "" } else { "?" }
+                                )
+                            })
+                            .collect();
+                        format!(", inputs={}", parts.join(", "))
                     };
-                    println!("# {}  (z={}{}{})", s.name, s.z, cost, inputs);
+                    println!("# {}  (z={}{}{}{})", s.name, s.z, cost, tool, inputs);
                     println!("{}", s.body);
                 }
             }

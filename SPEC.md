@@ -66,8 +66,16 @@ A skill plane is `@plane z=N label="<name>" kind=skill` plus these attributes:
 | Attribute | Meaning |
 |-----------|---------|
 | `triggers` | Comma-separated trigger phrases. A phrase matches a request when **every** word in the phrase appears in the request (case-insensitive). So `look up` matches only when both `look` and `up` are present, never on `up` alone. |
-| `inputs` | Comma-separated names of the data this skill expects. |
+| `inputs` | Comma-separated typed inputs the skill expects (see below). |
+| `tool` | Optional. The id of the concrete tool or function this skill drives, e.g. `db.query`. A loader can route a request to the skill and then call this tool with the skill's inputs. |
 | `cost` | Optional tag for side-effect / resource class (e.g. `net`, `db`). |
+
+**Typed inputs.** Each item in `inputs` is `name`, `name:type`, or `name:type?`.
+A trailing `?` marks the input **optional**; otherwise it is required. A bare
+name (`question`) is a required `string`. `type` is one of a closed set:
+`string`, `number`, `boolean`, `object`, `array`. The bare comma-separated form
+(`inputs="question, schema"`) is still valid: every name is a required `string`,
+so older agents keep working unchanged.
 
 The plane **body** is the skill's instructions, the prompt the agent loads when
 the skill is selected.
@@ -80,7 +88,7 @@ everything it needs.
 Example skill plane:
 
 ```
-@plane z=3 label="sql-query" kind=skill triggers="sql, database, query, rows, select" inputs="question, schema" cost="db"
+@plane z=3 label="sql-query" kind=skill triggers="sql, database, query, rows, select" inputs="question:string, schema:string, limit:number?" tool="db.query" cost="db"
 # Skill: sql-query
 
 Answer questions against a SQL database.
@@ -100,7 +108,7 @@ reference implementation):
 
 | Operation | Returns |
 |-----------|---------|
-| `manifest()` | The agent name, model, tools, persona, the identity body, and a **body-less** catalog of skills (`name`, `z`, `triggers`, `cost`). |
+| `manifest()` | The agent name, model, tools, persona, the identity body, and a **body-less** catalog of skills (`name`, `z`, `triggers`, `cost`, `tool`). |
 | `route(text)` | Skills whose triggers `text` satisfies, ranked by the number of **distinct trigger phrases matched** (best first), ties broken by lower `z`; each result carries the matched phrases. Tokens are maximal runs of Unicode letters/digits, lowercased. No match returns an empty list. |
 | `get(name \| z)` | A single skill including its full body. O(1). |
 | `resolve(name \| z)` | The skill plus its transitive dependency chain (following `[[z=N]]` / `[[z=N|label]]` links), each skill once, dependency-complete. |
@@ -127,6 +135,10 @@ A document is a conforming `agent3md/1` agent if:
   triggers is reachable only by name/`z`, never by `route()`).
 - **SHOULD** keep skill bodies self-contained so a single skill can be loaded
   without its siblings.
+- **MUST**, for each declared input, use a canonical type (`string`, `number`,
+  `boolean`, `object`, `array`); a bare name is a required `string`.
+- **MUST NOT** declare the same input name twice within one skill.
+- **SHOULD**, if a skill sets `tool`, make it non-empty.
 
 A conforming loader **MUST** ignore unknown frontmatter keys and unknown plane
 attributes rather than failing.
@@ -167,8 +179,11 @@ Give the one-sentence answer first, then three plain bullets.
 
 Because 3md parsers are maintained in Swift, TypeScript, and Rust against a
 shared conformance suite, `agent3md/1` loaders can be implemented identically in
-each: the format does the parsing, this spec defines the agent layer on top. A
-future revision may standardize richer attributes (typed `inputs`, explicit
-`tool` bindings per skill, capability scopes) and a small JSON projection of the
-manifest for cross-process discovery - additively, without breaking `agent3md/1`.
+each: the format does the parsing, this spec defines the agent layer on top.
+
+Typed `inputs` and per-skill `tool` bindings (above) were added this way:
+additively, so an older untyped agent stays valid and an older loader simply
+ignores the `tool` attribute. A future revision may standardize capability
+scopes in the same additive manner. A small JSON projection of the manifest for
+cross-process discovery already ships (`bun run export`, `schema: agent3md/1`).
 ```

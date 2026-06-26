@@ -1,6 +1,6 @@
 ---
 module: runtime
-version: 1
+version: 2
 status: draft
 files:
   - src/runtime.ts
@@ -33,7 +33,8 @@ whole file into context.
 | Type | Description |
 |------|-------------|
 | `Agent` | Loads one agent.3md and answers manifest / route / get / resolve over its skills. |
-| `Skill` | One skill plane: `z`, `name`, `triggers`, `inputs`, `cost`, `deps`, `body`. |
+| `Skill` | One skill plane: `z`, `name`, `triggers`, `inputs` (names), `inputSchema` (typed), `tool`, `cost`, `deps`, `body`. |
+| `SkillInput` | A typed input: `name`, `type` (string/number/boolean/object/array), `required`. |
 | `AgentManifest` | The agent identity plus a light skill catalog with no skill bodies. |
 
 ### Traits
@@ -60,6 +61,8 @@ whole file into context.
 4. A trigger phrase matches only when every one of its words appears in the request; an empty trigger never matches.
 5. `route` returns an empty array when nothing matches; results are sorted by descending score, then ascending z.
 6. `resolve` visits each plane at most once, so dependency cycles terminate.
+7. `inputs` (names) is derived from `inputSchema`, so the two never disagree; a bare input name parses as a required `string`.
+8. `tool` is `null` unless the plane sets a non-empty `tool` attribute.
 
 ## Behavioral Examples
 
@@ -92,3 +95,4 @@ Then the result is [code-review, cite-sources] in load order
 | Version | Date | Changes |
 |---------|------|---------|
 | 1 | 2026-06-26 | Initial spec for the reference loader (Agent: manifest / route / get / resolve). |
+| 2 | 2026-06-26 | Add typed inputs (`inputSchema`, `SkillInput`) and per-skill `tool` bindings; additive. |
