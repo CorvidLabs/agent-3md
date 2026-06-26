@@ -92,6 +92,13 @@ the exact command to run. The loop is **route -> fill -> run**: route a request
 to a skill, fill its inputs, run its command. A `tool` without placeholders (a
 bare binary, or an opaque id) is still valid; it just is not parameterized.
 
+**Not every skill is a command.** `tool` is optional. A skill with no `tool` is
+**guidance only**: its body is a playbook the agent follows using whatever
+capabilities the host already gives it. Web search, a judgment call, an action
+routed to a host or MCP tool, none of these need a CLI binding; the skill just
+describes what to do, and `command()` returns null for it. A real agent is
+usually a mix of command-backed and guidance-only skills.
+
 The plane **body** is the skill's instructions, the prompt the agent loads when
 the skill is selected.
 

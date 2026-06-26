@@ -5,14 +5,19 @@ rules); every other plane is a skill. The frontmatter is the manifest, each
 plane's attributes (`triggers=`, typed `inputs=`, `tool=`, `cost=`) are a
 queryable index, and `[[z=N|..]]` links are the skill dependency graph.
 
-Skills are **real**: each binds to an actual CLI command, and its typed inputs
-are that command's arguments. So routing a request is not "read some prose," it
-is **route -> fill -> run**: pick the skill, fill its inputs, get the exact
-command to run.
+Skills are **real**. A skill *can* bind to an actual CLI command (`tool=`), and
+then its typed inputs are that command's arguments, so routing is not "read some
+prose," it is **route -> fill -> run**: pick the skill, fill its inputs, get the
+exact command to run.
 
 ```
 @plane z=1 label="search" kind=skill triggers="search, find, grep" inputs="pattern:string, path:string" tool="rg --line-number {pattern} {path}"
 ```
+
+A `tool` is **optional**. Skills that are not command-shaped (web research, a
+judgment call, anything the *host's* own tools handle) carry no `tool` and are
+pure guidance the agent follows with whatever capabilities it has. So a real
+agent is usually a mix: some skills run a command, some are a playbook.
 
 The same file is human-readable documentation *and* a machine-queryable skill
 index, so the two can never drift. And because skills are addressable planes, an
@@ -100,7 +105,7 @@ conformance rules.
 
 | file | what |
 |---|---|
-| `agent.3md` | the flagship agent (`dev`): a terminal-first toolbox, identity + 6 CLI-backed skills |
+| `agent.3md` | the flagship agent (`dev`): a terminal-first toolbox, identity + 7 skills (6 command-backed + 1 guidance-only) |
 | `SPEC.md` | the agent3md/1 spec |
 | `src/threemd.ts` | the canonical 3md parser (vendored) |
 | `src/runtime.ts` | reference loader: `manifest / route / get / resolve / command` |
