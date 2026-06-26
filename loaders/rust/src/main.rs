@@ -29,24 +29,35 @@ fn csv(v: Option<&String>) -> Vec<String> {
     .unwrap_or_default()
 }
 
-/// Pull `[[z=N|..]]` dependency targets out of a plane body.
+/// Pull dependency targets out of a plane body. One grammar, shared with the TS
+/// runtime, validator, and spec: `[[z=N]]` or `[[z=N|label]]` (closing required).
 fn parse_deps(body: &str) -> Vec<i64> {
     let mut out = Vec::new();
     let b = body.as_bytes();
     let pat = b"[[z=";
     let mut i = 0;
     while i + pat.len() <= b.len() {
-        if &b[i..i + pat.len()] == pat {
-            let mut j = i + pat.len();
-            let mut num = String::new();
-            while j < b.len() && b[j].is_ascii_digit() {
-                num.push(b[j] as char);
-                j += 1;
+        if &b[i..i + pat.len()] != pat {
+            i += 1;
+            continue;
+        }
+        let start = i + pat.len();
+        let mut j = start;
+        while j < b.len() && b[j].is_ascii_digit() {
+            j += 1;
+        }
+        // optional `|label` (anything up to `]`), then require the closing `]]`
+        let mut k = j;
+        if k < b.len() && b[k] == b'|' {
+            while k < b.len() && b[k] != b']' {
+                k += 1;
             }
-            if let Ok(n) = num.parse::<i64>() {
+        }
+        if j > start && k + 1 < b.len() && b[k] == b']' && b[k + 1] == b']' {
+            if let Ok(n) = std::str::from_utf8(&b[start..j]).unwrap_or("").parse::<i64>() {
                 out.push(n);
             }
-            i = j;
+            i = k + 2;
         } else {
             i += 1;
         }
@@ -58,10 +69,20 @@ fn is_identity(p: &threemd::Plane) -> bool {
     p.attributes.get("kind").map(String::as_str) == Some("identity")
 }
 
-fn build_skills(doc: &Document) -> Vec<Skill> {
+/// The identity plane: the explicit `kind=identity` plane, else the first plane.
+fn identity_z(doc: &Document) -> Option<i64> {
     doc.planes
         .iter()
-        .filter(|p| !is_identity(p))
+        .find(|p| is_identity(p))
+        .or_else(|| doc.planes.first())
+        .map(|p| p.z as i64)
+}
+
+fn build_skills(doc: &Document) -> Vec<Skill> {
+    let id = identity_z(doc);
+    doc.planes
+        .iter()
+        .filter(|p| Some(p.z as i64) != id)
         .map(|p| {
             let z = p.z as i64;
             Skill {
@@ -77,31 +98,36 @@ fn build_skills(doc: &Document) -> Vec<Skill> {
         .collect()
 }
 
-fn words(text: &str) -> Vec<String> {
+/// Tokenize: maximal runs of Unicode letters/digits, lowercased. Identical to
+/// the TS and Swift loaders so routing never diverges.
+fn tokenize(text: &str) -> Vec<String> {
     text.to_lowercase()
-        .split(|c: char| !c.is_ascii_alphanumeric())
+        .split(|c: char| !c.is_alphanumeric())
         .filter(|w| !w.is_empty())
         .map(str::to_string)
         .collect()
 }
 
-/// Rank skills by the number of distinct request words that hit a trigger word.
+/// Route by trigger-phrase coverage: a trigger phrase matches only when ALL of
+/// its words appear in the request. Score = matched phrases; ties broken by z.
 fn route<'a>(skills: &'a [Skill], text: &str) -> Vec<(&'a Skill, Vec<String>)> {
-    let req = words(text);
+    let req: BTreeSet<String> = tokenize(text).into_iter().collect();
     let mut scored: Vec<(&Skill, Vec<String>)> = Vec::new();
     for s in skills {
-        let mut tw = BTreeSet::new();
-        for t in &s.triggers {
-            for w in t.split_whitespace() {
-                tw.insert(w.to_lowercase());
-            }
-        }
-        let hits: Vec<String> = req.iter().filter(|w| tw.contains(*w)).cloned().collect::<BTreeSet<_>>().into_iter().collect();
+        let hits: Vec<String> = s
+            .triggers
+            .iter()
+            .filter(|t| {
+                let tw = tokenize(t);
+                !tw.is_empty() && tw.iter().all(|w| req.contains(w))
+            })
+            .cloned()
+            .collect();
         if !hits.is_empty() {
             scored.push((s, hits));
         }
     }
-    scored.sort_by(|a, b| b.1.len().cmp(&a.1.len()));
+    scored.sort_by(|a, b| b.1.len().cmp(&a.1.len()).then(a.0.z.cmp(&b.0.z)));
     scored
 }
 
@@ -138,6 +164,37 @@ struct Issue {
     z: Option<i64>,
 }
 
+/// Return a plane z that lies on a dependency cycle, if any (DFS, three-color).
+fn find_cycle(links: &BTreeMap<i64, Vec<i64>>) -> Option<i64> {
+    fn dfs(z: i64, links: &BTreeMap<i64, Vec<i64>>, color: &mut BTreeMap<i64, u8>) -> Option<i64> {
+        color.insert(z, 1);
+        if let Some(ts) = links.get(&z) {
+            for &t in ts {
+                match color.get(&t).copied().unwrap_or(0) {
+                    1 => return Some(t),
+                    0 => {
+                        if let Some(c) = dfs(t, links, color) {
+                            return Some(c);
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+        color.insert(z, 2);
+        None
+    }
+    let mut color: BTreeMap<i64, u8> = BTreeMap::new();
+    for &z in links.keys() {
+        if color.get(&z).copied().unwrap_or(0) == 0 {
+            if let Some(c) = dfs(z, links, &mut color) {
+                return Some(c);
+            }
+        }
+    }
+    None
+}
+
 fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
     let mut errors = Vec::new();
     let mut warnings = Vec::new();
@@ -154,27 +211,34 @@ fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
         err("frontmatter", "need a `title:` or `agent:` to name the agent".into(), None);
     }
 
-    // exactly one identity plane
-    let identities: Vec<&threemd::Plane> = doc.planes.iter().filter(|p| is_identity(p)).collect();
-    if identities.is_empty() {
-        err("identity", "no identity plane found (mark one plane `kind=identity`)".into(), None);
-    } else if identities.len() > 1 {
-        err("identity", format!("expected exactly one identity plane, found {}", identities.len()), Some(identities[1].z as i64));
+    // identity: one explicit kind=identity, or (fallback) the first plane
+    let explicit: Vec<&threemd::Plane> = doc.planes.iter().filter(|p| is_identity(p)).collect();
+    if explicit.len() > 1 {
+        err("identity", format!("expected one identity plane, found {}", explicit.len()), Some(explicit[1].z as i64));
+    } else if explicit.is_empty() && doc.planes.is_empty() {
+        err("identity", "document has no planes (need at least an identity plane)".into(), None);
     }
+    let id = identity_z(doc);
+    let is_skill = |p: &&threemd::Plane| Some(p.z as i64) != id;
 
-    // unique skill names (labels), among non-identity planes
+    // every skill has a unique, non-empty label
     let mut seen: BTreeMap<String, i64> = BTreeMap::new();
-    for p in doc.planes.iter().filter(|p| !is_identity(p)) {
+    for p in doc.planes.iter().filter(is_skill) {
         let z = p.z as i64;
-        let name = p.label.clone().unwrap_or_else(|| format!("skill-{z}"));
-        if let Some(prev) = seen.get(&name) {
-            err("unique-skill", format!("duplicate skill name \"{name}\" (also at z={prev})"), Some(z));
-        } else {
-            seen.insert(name, z);
+        match p.label.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
+            None => err("missing-label", format!("skill at z={z} has no label (every skill needs a name)"), Some(z)),
+            Some(name) => {
+                let name = name.to_string();
+                if let Some(prev) = seen.get(&name) {
+                    err("unique-skill", format!("duplicate skill name \"{name}\" (also at z={prev})"), Some(z));
+                } else {
+                    seen.insert(name, z);
+                }
+            }
         }
     }
 
-    // every [[z=N]] link points to a real plane
+    // every [[z=N]] link targets a real plane
     let plane_z: BTreeSet<i64> = doc.planes.iter().map(|p| p.z as i64).collect();
     for p in &doc.planes {
         for target in parse_deps(&p.body) {
@@ -184,16 +248,27 @@ fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
         }
     }
 
-    // entry (if present) resolves
+    // entry (if present) must be a plane z (integer) that exists
     if let Some(entry) = doc.metadata.get("entry") {
         match entry.trim().parse::<i64>() {
-            Ok(n) if plane_z.contains(&n) => {}
-            _ => err("entry", format!("entry: \"{entry}\" does not resolve to a real plane"), None),
+            Err(_) => err("entry", format!("entry: \"{entry}\" must be a plane z (an integer)"), None),
+            Ok(n) if !plane_z.contains(&n) => err("entry", format!("entry: \"{entry}\" does not resolve to a real plane"), None),
+            Ok(_) => {}
         }
     }
 
+    // no dependency cycles (a -> ... -> a via [[z=N]] links)
+    let links: BTreeMap<i64, Vec<i64>> = doc
+        .planes
+        .iter()
+        .map(|p| (p.z as i64, parse_deps(&p.body).into_iter().filter(|t| plane_z.contains(t)).collect()))
+        .collect();
+    if let Some(node) = find_cycle(&links) {
+        err("cycle", format!("dependency cycle detected (involving plane z={node})"), Some(node));
+    }
+
     // each skill SHOULD have triggers (warning)
-    for p in doc.planes.iter().filter(|p| !is_identity(p)) {
+    for p in doc.planes.iter().filter(is_skill) {
         let z = p.z as i64;
         let triggers = p.attributes.get("triggers").map(|s| s.trim()).unwrap_or("");
         if triggers.is_empty() {

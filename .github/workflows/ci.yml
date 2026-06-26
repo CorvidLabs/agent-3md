@@ -1,0 +1,43 @@
+name: ci
+
+# Keeps the reference kit honest on every push/PR: the TS test suite + build
+# (which must emit dist/index.d.ts), the Rust loader build, and the Swift loader
+# build. The cross-language builds guard the "loads identically in 3 languages"
+# claim against parser/loader drift.
+on:
+  push:
+  pull_request:
+
+jobs:
+  ts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - name: Conformance + unit tests
+        run: bun test
+      - name: Build (must produce type declarations)
+        run: bun run build
+      - name: Type declarations are shipped
+        run: test -f dist/index.d.ts
+
+  rust-loader:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # ubuntu-latest ships a stable Rust toolchain; the threemd parser is
+      # vendored at loaders/vendor/threemd, so no sibling checkout is needed.
+      - name: Rust loader builds
+        run: cd loaders/rust && cargo build
+
+  swift-loader:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The Swift loader fetches the ThreeMD package from git (CorvidLabs/3md),
+      # so the build needs network but no sibling checkout.
+      - name: Swift loader builds
+        run: cd loaders/swift && swift build

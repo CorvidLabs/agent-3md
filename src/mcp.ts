@@ -4,12 +4,33 @@
 // stdout; everything else (logging) goes to stderr so the stream stays clean.
 //
 // Usage: bun src/mcp.ts [path/to/agent.3md]
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { resolve, extname } from "node:path";
 import { Agent } from "./runtime";
 
-const agentPath = process.argv[2] ?? fileURLToPath(new URL("../agent.3md", import.meta.url));
-const agent = new Agent(readFileSync(agentPath, "utf8"));
+// Hard limits so an untrusted file or client cannot exhaust memory.
+const MAX_DOC_BYTES = 5 * 1024 * 1024;   // largest agent.3md we will load
+const MAX_LINE_BYTES = 10 * 1024 * 1024; // largest single JSON-RPC line we will buffer
+
+function die(message: string): never {
+  process.stderr.write(`[agent-3md mcp] ${message}\n`);
+  process.exit(1);
+}
+
+// Path safety: resolve to an absolute path and require a .3md file, rather than
+// feeding an arbitrary path from argv straight into the reader.
+const rawPath = process.argv[2] ?? fileURLToPath(new URL("../agent.3md", import.meta.url));
+const agentPath = resolve(rawPath);
+if (extname(agentPath).toLowerCase() !== ".3md") die(`refusing to load a non-.3md file: ${agentPath}`);
+let docBytes: number;
+try { docBytes = statSync(agentPath).size; }
+catch (e) { die(`cannot read ${agentPath}: ${(e as Error).message}`); }
+if (docBytes > MAX_DOC_BYTES) die(`document too large (${docBytes} bytes > ${MAX_DOC_BYTES}); refusing to load.`);
+
+let agent: Agent;
+try { agent = new Agent(readFileSync(agentPath, "utf8")); }
+catch (e) { die(`failed to parse ${agentPath}: ${(e as Error).message}`); }
 const man = agent.manifest();
 
 const TOOLS = [
@@ -77,6 +98,11 @@ function handle(msg: any): object | null {
   const { id, method, params } = msg ?? {};
   // notifications have no id; acknowledge by doing nothing
   if (id === undefined || id === null) return null;
+  // JSON-RPC 2.0 requires id to be a string or number (or null). Reject objects,
+  // arrays, and booleans with an Invalid Request error; never echo a bad id back.
+  if (typeof id !== "string" && typeof id !== "number") {
+    return { jsonrpc: "2.0", id: null, error: { code: -32600, message: "invalid request: id must be a string, number, or null" } };
+  }
   const ok = (result: unknown) => ({ jsonrpc: "2.0", id, result });
   const fail = (code: number, message: string) => ({ jsonrpc: "2.0", id, error: { code, message } });
 
@@ -108,6 +134,14 @@ const decoder = new TextDecoder();
 let buf = "";
 for await (const chunk of Bun.stdin.stream()) {
   buf += decoder.decode(chunk);
+  // Guard against an unbounded line: if we have buffered more than the cap and
+  // still have no line delimiter, drop it and report a parse error rather than
+  // growing memory without limit.
+  if (buf.length > MAX_LINE_BYTES && buf.indexOf("\n") < 0) {
+    buf = "";
+    out({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error: line exceeded maximum size" } });
+    continue;
+  }
   let nl: number;
   while ((nl = buf.indexOf("\n")) >= 0) {
     const line = buf.slice(0, nl).trim();

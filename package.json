@@ -4,11 +4,17 @@
   "description": "agent.3md: one 3md file is a whole agent (identity + on-demand skills). Loader, validator, router, and MCP-ready, on the canonical 3md parser.",
   "type": "module",
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/CorvidLabs/agent-3md.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CorvidLabs/agent-3md.git"
+  },
   "main": "./dist/index.js",
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./src/index.ts", "default": "./dist/index.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
   "files": [
     "dist",
@@ -20,9 +26,11 @@
     "agent.3md",
     "README.md"
   ],
-  "publishConfig": { "registry": "https://npm.pkg.github.com" },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --target node --format esm",
+    "build": "bun build src/index.ts --outdir dist --target node --format esm && tsc -p tsconfig.build.json",
     "prepublishOnly": "bun run build",
     "demo": "bun run src/demo.ts",
     "run": "bun run src/run.ts",
@@ -40,5 +48,10 @@
     "gen:agents": "bun run src/scale/gen-big-agent.ts",
     "loaders:rust": "cd loaders/rust && cargo run -q",
     "loaders:swift": "cd loaders/swift && swift run"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.1",
+    "bun-types": "^1.3.14",
+    "typescript": "^6.0.3"
   }
 }

@@ -38,19 +38,25 @@ export function validateAgent(src: string): Report {
   if (!doc.metadata.model) err("frontmatter", "missing required `model:` frontmatter");
   if (!doc.title && !doc.metadata.agent) err("frontmatter", "need a `title:` or `agent:` to name the agent");
 
-  // --- exactly one identity plane (kind=identity) ---
-  const identities = doc.planes.filter((p) => (p.attributes.kind ?? "") === "identity");
-  if (identities.length === 0) err("identity", "no identity plane found (mark one plane `kind=identity`)");
-  else if (identities.length > 1) {
-    err("identity", `expected exactly one identity plane, found ${identities.length}`, identities[1].z);
+  // --- identity plane: exactly one explicit `kind=identity`, or (fallback) the
+  //     first plane when none is marked. Only an empty document is fatal. ---
+  const explicitIds = doc.planes.filter((p) => (p.attributes.kind ?? "") === "identity");
+  if (explicitIds.length > 1) {
+    err("identity", `expected one identity plane, found ${explicitIds.length}`, explicitIds[1].z);
+  } else if (explicitIds.length === 0 && doc.planes.length === 0) {
+    err("identity", "document has no planes (need at least an identity plane)");
   }
-  const identitySet = new Set(identities.map((p) => p.z));
+  const identitySet = new Set<number>(
+    explicitIds.length ? explicitIds.map((p) => p.z)
+      : doc.planes.length ? [doc.planes[0].z] : []
+  );
   const skills = doc.planes.filter((p) => !identitySet.has(p.z));
 
-  // --- unique skill names (labels) ---
+  // --- every skill has a unique, non-empty name (label) ---
   const seen = new Map<string, number>();
   for (const s of skills) {
-    const name = s.label ?? `skill-${s.z}`;
+    const name = s.label?.trim();
+    if (!name) { err("missing-label", `skill at z=${s.z} has no label (every skill needs a name)`, s.z); continue; }
     if (seen.has(name)) err("unique-skill", `duplicate skill name "${name}" (also at z=${seen.get(name)})`, s.z);
     else seen.set(name, s.z);
   }
@@ -64,13 +70,35 @@ export function validateAgent(src: string): Report {
     }
   }
 
-  // --- entry (if present) resolves to a real plane ---
+  // --- entry (if present) must be a plane z (integer) that exists ---
   if (doc.metadata.entry !== undefined) {
-    const entryZ = Number(doc.metadata.entry);
-    if (!Number.isFinite(entryZ) || !planeZ.has(entryZ)) {
+    const raw = String(doc.metadata.entry).trim();
+    if (!/^-?\d+$/.test(raw)) {
+      err("entry", `entry: "${doc.metadata.entry}" must be a plane z (an integer)`);
+    } else if (!planeZ.has(Number(raw))) {
       err("entry", `entry: "${doc.metadata.entry}" does not resolve to a real plane`);
     }
   }
+
+  // --- no dependency cycles (a -> ... -> a via [[z=N]] links) ---
+  const links = new Map<number, number[]>();
+  for (const p of doc.planes) {
+    links.set(p.z, [...p.body.matchAll(LINK_RE)].map((m) => Number(m[1])).filter((t) => planeZ.has(t)));
+  }
+  const color = new Map<number, 0 | 1 | 2>(); // 0 unseen, 1 on-stack, 2 done
+  let cyclic: number | undefined;
+  const walk = (z: number) => {
+    if (cyclic !== undefined) return;
+    color.set(z, 1);
+    for (const t of links.get(z) ?? []) {
+      const c = color.get(t) ?? 0;
+      if (c === 1) { cyclic = t; return; }
+      if (c === 0) { walk(t); if (cyclic !== undefined) return; }
+    }
+    color.set(z, 2);
+  };
+  for (const p of doc.planes) { if ((color.get(p.z) ?? 0) === 0) walk(p.z); if (cyclic !== undefined) break; }
+  if (cyclic !== undefined) err("cycle", `dependency cycle detected (involving plane z=${cyclic})`, cyclic);
 
   // --- each skill SHOULD have triggers (warning) ---
   for (const s of skills) {

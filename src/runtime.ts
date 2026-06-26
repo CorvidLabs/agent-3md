@@ -11,9 +11,17 @@ export interface Skill {
   readonly triggers: string[];
   readonly inputs: string[];
   readonly cost: string | null;
-  readonly deps: number[];      // z indices of [[z=N|..]] links in the body
+  readonly deps: number[];      // z indices of [[z=N]] / [[z=N|label]] links in the body
   readonly body: string;
 }
+
+// A dependency / cross-plane link: `[[z=N]]` or `[[z=N|label]]`. One grammar,
+// shared by the runtime, the validator, the spec, and the Rust/Swift loaders.
+const LINK_RE = /\[\[z=(\d+)(?:\|[^\]]*)?\]\]/g;
+
+// Tokenize for routing: maximal runs of Unicode letters/digits, lowercased.
+// Identical across the TS, Rust, and Swift loaders so routing never diverges.
+const tokenize = (s: string): string[] => s.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [];
 
 export interface AgentManifest {
   readonly name: string;
@@ -31,7 +39,6 @@ export class Agent {
   private doc: Document;
   private byName = new Map<string, Skill>();
   private byZ = new Map<number, Skill>();
-  private triggerIndex = new Map<string, Set<string>>(); // word -> skill names
   readonly identityPlane: Plane;
 
   constructor(src: string) {
@@ -41,23 +48,17 @@ export class Agent {
     this.identityPlane = identity;
     for (const p of this.doc.planes) {
       if (p === identity) continue;
-      const triggers = csv(p.attributes.triggers);
-      const deps = [...p.body.matchAll(/\[\[z=(\d+)\|/g)].map((m) => Number(m[1]));
       const skill: Skill = {
         z: p.z,
         name: p.label ?? `skill-${p.z}`,
-        triggers,
+        triggers: csv(p.attributes.triggers),
         inputs: csv(p.attributes.inputs),
         cost: p.attributes.cost ?? null,
-        deps,
+        deps: [...p.body.matchAll(LINK_RE)].map((m) => Number(m[1])),
         body: p.body,
       };
       this.byName.set(skill.name, skill);
       this.byZ.set(skill.z, skill);
-      for (const t of triggers) for (const w of t.split(/\s+/)) {
-        const key = w.toLowerCase();
-        (this.triggerIndex.get(key) ?? this.triggerIndex.set(key, new Set()).get(key)!).add(skill.name);
-      }
     }
   }
 
@@ -79,21 +80,23 @@ export class Agent {
     return typeof nameOrZ === "number" ? this.byZ.get(nameOrZ) : this.byName.get(nameOrZ);
   }
 
-  /** Route a free-text request to the best-matching skills, ranked by trigger hits. */
+  /**
+   * Route a request to skills whose triggers it satisfies. Score = the number
+   * of distinct trigger phrases matched (a trigger phrase matches only when ALL
+   * of its words appear in the request, so "look up" needs both "look" and
+   * "up"). Sorted by score, ties broken by lower z. Empty array = no match.
+   */
   route(text: string): { skill: Skill; score: number; hits: string[] }[] {
-    const words = text.toLowerCase().match(/[a-z]+/g) ?? [];
-    const score = new Map<string, { n: number; hits: Set<string> }>();
-    for (const w of words) {
-      const names = this.triggerIndex.get(w);
-      if (!names) continue;
-      for (const name of names) {
-        const e = score.get(name) ?? { n: 0, hits: new Set<string>() };
-        e.n++; e.hits.add(w); score.set(name, e);
-      }
+    const req = new Set(tokenize(text));
+    const out: { skill: Skill; score: number; hits: string[] }[] = [];
+    for (const skill of this.byName.values()) {
+      const hits = skill.triggers.filter((t) => {
+        const tw = tokenize(t);
+        return tw.length > 0 && tw.every((w) => req.has(w));
+      });
+      if (hits.length) out.push({ skill, score: hits.length, hits });
     }
-    return [...score.entries()]
-      .map(([name, e]) => ({ skill: this.byName.get(name)!, score: e.n, hits: [...e.hits] }))
-      .sort((a, b) => b.score - a.score);
+    return out.sort((a, b) => b.score - a.score || a.skill.z - b.skill.z);
   }
 
   /** Resolve a skill plus everything it depends on (via [[z=N]] links), transitively. */

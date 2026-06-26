@@ -1,0 +1,16 @@
+---
+3md: 1.0
+title: Cycle
+model: claude-opus-4-8
+---
+@plane z=0 label="Cycle" kind=identity
+# Cycle
+Identity.
+
+@plane z=1 label="a" kind=skill triggers="a"
+# Skill: a
+Depends on [[z=2|b]].
+
+@plane z=2 label="b" kind=skill triggers="b"
+# Skill: b
+Depends on [[z=1|a]], which closes a loop. RULE: cycle.
