@@ -1,7 +1,7 @@
 name: publish
 
-# Publishes @corvidlabs/agent3md to GitHub Packages on each GitHub release.
-# The built-in GITHUB_TOKEN authenticates to npm.pkg.github.com (packages:write).
+# Publishes @corvidlabs/agent3md to the public npm registry on each GitHub release.
+# Authenticates via npm Trusted Publishers (OIDC) — no NPM_TOKEN secret needed.
 on:
   release:
     types: [published]
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          registry-url: "https://npm.pkg.github.com"
+          registry-url: "https://registry.npmjs.org"
           scope: "@corvidlabs"
       - run: bun install --frozen-lockfile
       - name: Sync version to the release tag
@@ -29,6 +29,4 @@ jobs:
         run: npm version "${TAG#v}" --no-git-tag-version --allow-same-version
         env:
           TAG: ${{ github.event.release.tag_name }}
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: npm publish --provenance --access public
