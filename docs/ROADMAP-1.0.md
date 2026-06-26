@@ -40,13 +40,17 @@ taking them on faith. This doc records what they found, what is fixed, and what
 - **Adoption**: CI runs `bun test` plus the Rust and Swift loader builds (so the
   parity claim is guarded); the package now ships real `.d.ts` declarations; the
   install docs spell out the GitHub Packages `read:packages` PAT.
+- **Rust loader off vendoring**: it now uses the published `threemd` crate from
+  crates.io (`threemd = "1.0"`), so a fresh clone builds all three loaders with
+  nothing vendored and no parser-drift risk.
+- **Parser hardening shipped upstream** (CorvidLabs/3md#42): parsed frontmatter
+  and `@plane` attribute maps are now null-prototype, so untrusted keys like
+  `constructor` can never land on a prototype. Re-vendored here (v0.2.1).
 
 ## Still needed for 1.0.0
 
 - A cleaner install path (public npm registry, or keep GitHub Packages but make
   the token step truly one command).
-- Parser-level hardening upstream in `CorvidLabs/3md` (allocate parsed
-  attribute maps with a null prototype to remove the proto-key landmine).
 - Typed skill `inputs` and tool bindings, so a skill body can declare the tool
   it drives (`SPEC.md` §future).
 - Real external adopters. Until then this is a proposed format, not a standard.
