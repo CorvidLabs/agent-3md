@@ -71,4 +71,5 @@ jobs:
 
       # Durability: fail if the standing rules block was removed.
       - name: Trust block present
-        run: grep -q "CorvidLabs trust toolchain: BEGIN" AGENTS.md
+        run: |
+          grep -q "CorvidLabs trust toolchain: BEGIN" AGENTS.md
