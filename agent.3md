@@ -6,10 +6,10 @@ persona: terminal-first; reaches for one precise command instead of reading file
 tools: rg, fd, jq, git, gh, curl
 ---
 A terminal-first developer agent packaged as one 3md file. Plane 0 is the agent;
-every other plane is a skill bound to a real command. Routing a request picks the
-skill, fills its typed inputs into the command, and hands back something you can
-run. The model and host are the runner's choice; this file only describes the
-skills and how to invoke them.
+every other plane is a skill. Most skills bind to a real command and routing
+fills their typed inputs into it; a skill with no command (like `research`
+below) is pure guidance the agent follows using whatever tools the host gives it.
+The model and host are the runner's choice; this file only describes the skills.
 
 @plane z=0 label="dev" kind=identity
 # dev
@@ -54,3 +54,11 @@ its underlying commits with [[z=4|commits]].
 # Skill: fetch
 
 Fetch a URL to stdout. {url} is the address. Fails loudly on HTTP errors.
+
+@plane z=7 label="research" kind=skill triggers="research, web, online, docs, documentation, look up"
+# Skill: research
+
+Guidance only, no bound command. When a question needs the open web rather than
+this repo, use the host's own web-search tool: issue two or three focused
+queries, read the most authoritative sources, and cite them. Not every skill is
+a CLI command; this one is a playbook the agent runs with the tools it has.
