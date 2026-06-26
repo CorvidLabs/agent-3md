@@ -1,5 +1,5 @@
 // Spawn the MCP server as a child process, speak JSON-RPC to it over stdio, and
-// print the responses — proof that any MCP client can drive an agent.3md.
+// print the responses - proof that any MCP client can drive an agent.3md.
 import { fileURLToPath } from "node:url";
 
 const mcpPath = fileURLToPath(new URL("./mcp.ts", import.meta.url));
@@ -45,7 +45,7 @@ for await (const chunk of proc.stdout) {
 const show = (id: number, label: string, pick: (m: any) => string) =>
   console.log(`\n[id ${id}] ${label}\n  ${pick(got.get(id)).split("\n").join("\n  ")}`);
 
-console.log("MCP SELFTEST — client <-> server over stdio JSON-RPC");
+console.log("MCP SELFTEST - client <-> server over stdio JSON-RPC");
 console.log("=".repeat(60));
 show(1, "initialize", (m) => `${m.result.serverInfo.name}  proto=${m.result.protocolVersion}`);
 show(2, "tools/list", (m) => m.result.tools.map((t: any) => `${t.name}(${Object.keys(t.inputSchema.properties).join(",")})`).join("\n"));

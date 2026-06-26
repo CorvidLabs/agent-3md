@@ -1,4 +1,4 @@
-# agent.3md over MCP — integration demo
+# agent.3md over MCP - integration demo
 
 An orchestrator drives the `agent.3md` MCP server (`src/mcp.ts`) over stdio.
 For each request it calls `route_skill` to pick a skill, `get_skill` to load
@@ -8,7 +8,7 @@ a live query against an in-memory database; `summarize` runs for real.
 Run it: `bun src/integration-demo.ts`
 
 ```
-agent.3md  x  MCP  —  route -> load -> execute (all over the MCP round-trip)
+agent.3md  x  MCP  -  route -> load -> execute (all over the MCP round-trip)
 ====================================================================
 connected: agent-3md:Atlas  (proto 2024-11-05)
 

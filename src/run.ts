@@ -49,7 +49,7 @@ function handle(request: string, payload = request): void {
   console.log(`  exec  -> ${out.split("\n").join("\n          ")}`);
 }
 
-console.log("Atlas (driven by agent.3md) — route -> load -> execute\n" + "=".repeat(60));
+console.log("Atlas (driven by agent.3md) - route -> load -> execute\n" + "=".repeat(60));
 handle("what rows in the orders table have a null total?");
 handle(
   "give me a tldr of this",

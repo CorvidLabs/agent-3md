@@ -113,7 +113,7 @@ export function formatReport(file: string, r: Report): string {
   const lines: string[] = [`agent3md validate: ${file}`];
   for (const e of r.errors) lines.push(`  ✗ [${e.rule}]${e.z !== undefined ? ` z=${e.z}` : ""}  ${e.message}`);
   for (const w of r.warnings) lines.push(`  ⚠ [${w.rule}]${w.z !== undefined ? ` z=${w.z}` : ""}  ${w.message}`);
-  lines.push(`  ${r.ok ? "PASS" : "FAIL"} — ${r.errors.length} error(s), ${r.warnings.length} warning(s)`);
+  lines.push(`  ${r.ok ? "PASS" : "FAIL"} - ${r.errors.length} error(s), ${r.warnings.length} warning(s)`);
   return lines.join("\n");
 }
 
