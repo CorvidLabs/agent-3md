@@ -1,10 +1,29 @@
 {
-  "name": "agent-3md",
+  "name": "@corvidlabs/agent3md",
   "version": "0.1.0",
-  "private": true,
+  "description": "agent.3md: one 3md file is a whole agent (identity + on-demand skills). Loader, validator, router, and MCP-ready, on the canonical 3md parser.",
   "type": "module",
-  "description": "The agent.3md standard: one 3md file is a whole agent (identity + on-demand skills), with loaders in TS/Rust/Swift, a validator, CLI, MCP server, and JSON projection.",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/CorvidLabs/agent-3md.git" },
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": { "types": "./src/index.ts", "default": "./dist/index.js" }
+  },
+  "files": [
+    "dist",
+    "src/index.ts",
+    "src/runtime.ts",
+    "src/validate.ts",
+    "src/threemd.ts",
+    "SPEC.md",
+    "agent.3md",
+    "README.md"
+  ],
+  "publishConfig": { "registry": "https://npm.pkg.github.com" },
   "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target node --format esm",
+    "prepublishOnly": "bun run build",
     "demo": "bun run src/demo.ts",
     "run": "bun run src/run.ts",
     "benchmark": "bun run src/benchmark.ts",

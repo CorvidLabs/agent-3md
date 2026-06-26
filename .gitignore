@@ -4,3 +4,4 @@ node_modules
 loaders/rust/target
 loaders/swift/.build
 src/scale/agent-*.3md
+dist
