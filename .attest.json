@@ -1,0 +1,6 @@
+{
+  "requireAttestation": true,
+  "requireTestsPassed": true,
+  "requireSignature": false,
+  "allowedReviewers": ["agent:claude", "human:"]
+}

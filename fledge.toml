@@ -1,0 +1,36 @@
+# fledge.toml - project task definitions and lanes
+# Detected project type: typescript (bun) + rust + swift loaders
+#
+# The single CI gate is the `verify` lane (see AGENTS.md). Run it with:
+#   fledge lanes run verify
+
+[tasks]
+# TypeScript reference implementation: install pinned deps, then run the
+# conformance + unit suite. This is the package and the spec's reference.
+test = "bun install --frozen-lockfile && bun test"
+# Build the published bundle and emit the type declarations.
+build = "bun run build"
+# Guard the shipped types: the build must produce dist/index.d.ts.
+types = "test -f dist/index.d.ts"
+
+[tasks.rust]
+cmd = "cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test"
+dir = "loaders/rust"
+description = "Rust agent3md CLI: format check, clippy (deny warnings), and tests."
+
+[tasks.swift]
+cmd = "swift build"
+dir = "loaders/swift"
+description = "Swift loader builds on the canonical ThreeMD package (proves the format ports)."
+
+[tasks.spec]
+cmd = "fledge spec check"
+description = "spec-sync: every module spec matches its tracked source files."
+
+[lanes.verify]
+description = "The single CI gate: the TypeScript reference (test + typed build) plus the Rust and Swift loaders and spec-sync."
+steps = ["test", "build", "types", "rust", "swift", "spec"]
+
+[lanes.ci]
+description = "Alias for the verify gate."
+steps = ["test", "build", "types", "rust", "swift", "spec"]

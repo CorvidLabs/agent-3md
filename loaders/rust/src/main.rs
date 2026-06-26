@@ -54,7 +54,10 @@ fn parse_deps(body: &str) -> Vec<i64> {
             }
         }
         if j > start && k + 1 < b.len() && b[k] == b']' && b[k + 1] == b']' {
-            if let Ok(n) = std::str::from_utf8(&b[start..j]).unwrap_or("").parse::<i64>() {
+            if let Ok(n) = std::str::from_utf8(&b[start..j])
+                .unwrap_or("")
+                .parse::<i64>()
+            {
                 out.push(n);
             }
             i = k + 2;
@@ -140,7 +143,12 @@ fn resolve<'a>(skills: &'a [Skill], name: &str) -> Vec<&'a Skill> {
     let by_z: BTreeMap<i64, &Skill> = skills.iter().map(|s| (s.z, s)).collect();
     let mut out = Vec::new();
     let mut seen = BTreeSet::new();
-    fn visit<'a>(s: &'a Skill, by_z: &BTreeMap<i64, &'a Skill>, seen: &mut BTreeSet<i64>, out: &mut Vec<&'a Skill>) {
+    fn visit<'a>(
+        s: &'a Skill,
+        by_z: &BTreeMap<i64, &'a Skill>,
+        seen: &mut BTreeSet<i64>,
+        out: &mut Vec<&'a Skill>,
+    ) {
         if !seen.insert(s.z) {
             return;
         }
@@ -198,25 +206,42 @@ fn find_cycle(links: &BTreeMap<i64, Vec<i64>>) -> Option<i64> {
 fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
     let mut errors = Vec::new();
     let mut warnings = Vec::new();
-    let mut err = |rule: &'static str, msg: String, z: Option<i64>| errors.push(Issue { rule, msg, z });
+    let mut err =
+        |rule: &'static str, msg: String, z: Option<i64>| errors.push(Issue { rule, msg, z });
 
     // required frontmatter: 3md version, model, and (title or agent)
     if doc.version.trim().is_empty() {
         err("frontmatter", "missing `3md:` version line".into(), None);
     }
     if !doc.metadata.contains_key("model") {
-        err("frontmatter", "missing required `model:` frontmatter".into(), None);
+        err(
+            "frontmatter",
+            "missing required `model:` frontmatter".into(),
+            None,
+        );
     }
     if doc.title.is_none() && !doc.metadata.contains_key("agent") {
-        err("frontmatter", "need a `title:` or `agent:` to name the agent".into(), None);
+        err(
+            "frontmatter",
+            "need a `title:` or `agent:` to name the agent".into(),
+            None,
+        );
     }
 
     // identity: one explicit kind=identity, or (fallback) the first plane
     let explicit: Vec<&threemd::Plane> = doc.planes.iter().filter(|p| is_identity(p)).collect();
     if explicit.len() > 1 {
-        err("identity", format!("expected one identity plane, found {}", explicit.len()), Some(explicit[1].z as i64));
+        err(
+            "identity",
+            format!("expected one identity plane, found {}", explicit.len()),
+            Some(explicit[1].z as i64),
+        );
     } else if explicit.is_empty() && doc.planes.is_empty() {
-        err("identity", "document has no planes (need at least an identity plane)".into(), None);
+        err(
+            "identity",
+            "document has no planes (need at least an identity plane)".into(),
+            None,
+        );
     }
     let id = identity_z(doc);
     let is_skill = |p: &&threemd::Plane| Some(p.z as i64) != id;
@@ -226,11 +251,19 @@ fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
     for p in doc.planes.iter().filter(is_skill) {
         let z = p.z as i64;
         match p.label.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
-            None => err("missing-label", format!("skill at z={z} has no label (every skill needs a name)"), Some(z)),
+            None => err(
+                "missing-label",
+                format!("skill at z={z} has no label (every skill needs a name)"),
+                Some(z),
+            ),
             Some(name) => {
                 let name = name.to_string();
                 if let Some(prev) = seen.get(&name) {
-                    err("unique-skill", format!("duplicate skill name \"{name}\" (also at z={prev})"), Some(z));
+                    err(
+                        "unique-skill",
+                        format!("duplicate skill name \"{name}\" (also at z={prev})"),
+                        Some(z),
+                    );
                 } else {
                     seen.insert(name, z);
                 }
@@ -243,7 +276,11 @@ fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
     for p in &doc.planes {
         for target in parse_deps(&p.body) {
             if !plane_z.contains(&target) {
-                err("dead-link", format!("link [[z={target}]] points to a plane that does not exist"), Some(p.z as i64));
+                err(
+                    "dead-link",
+                    format!("link [[z={target}]] points to a plane that does not exist"),
+                    Some(p.z as i64),
+                );
             }
         }
     }
@@ -251,8 +288,16 @@ fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
     // entry (if present) must be a plane z (integer) that exists
     if let Some(entry) = doc.metadata.get("entry") {
         match entry.trim().parse::<i64>() {
-            Err(_) => err("entry", format!("entry: \"{entry}\" must be a plane z (an integer)"), None),
-            Ok(n) if !plane_z.contains(&n) => err("entry", format!("entry: \"{entry}\" does not resolve to a real plane"), None),
+            Err(_) => err(
+                "entry",
+                format!("entry: \"{entry}\" must be a plane z (an integer)"),
+                None,
+            ),
+            Ok(n) if !plane_z.contains(&n) => err(
+                "entry",
+                format!("entry: \"{entry}\" does not resolve to a real plane"),
+                None,
+            ),
             Ok(_) => {}
         }
     }
@@ -261,10 +306,22 @@ fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
     let links: BTreeMap<i64, Vec<i64>> = doc
         .planes
         .iter()
-        .map(|p| (p.z as i64, parse_deps(&p.body).into_iter().filter(|t| plane_z.contains(t)).collect()))
+        .map(|p| {
+            (
+                p.z as i64,
+                parse_deps(&p.body)
+                    .into_iter()
+                    .filter(|t| plane_z.contains(t))
+                    .collect(),
+            )
+        })
         .collect();
     if let Some(node) = find_cycle(&links) {
-        err("cycle", format!("dependency cycle detected (involving plane z={node})"), Some(node));
+        err(
+            "cycle",
+            format!("dependency cycle detected (involving plane z={node})"),
+            Some(node),
+        );
     }
 
     // each skill SHOULD have triggers (warning)
@@ -273,7 +330,11 @@ fn validate(doc: &Document) -> (Vec<Issue>, Vec<Issue>) {
         let triggers = p.attributes.get("triggers").map(|s| s.trim()).unwrap_or("");
         if triggers.is_empty() {
             let name = p.label.clone().unwrap_or_else(|| format!("skill-{z}"));
-            warnings.push(Issue { rule: "triggers", msg: format!("skill \"{name}\" has no triggers; it can never be routed to"), z: Some(z) });
+            warnings.push(Issue {
+                rule: "triggers",
+                msg: format!("skill \"{name}\" has no triggers; it can never be routed to"),
+                z: Some(z),
+            });
         }
     }
 
@@ -309,7 +370,9 @@ fn fail(msg: &str) -> ! {
 /// binary is installed with `cargo install agent3md`).
 fn split_file(args: &[String]) -> (String, &[String]) {
     match args.first() {
-        Some(a) if a.ends_with(".3md") || std::path::Path::new(a).exists() => (a.clone(), &args[1..]),
+        Some(a) if a.ends_with(".3md") || std::path::Path::new(a).exists() => {
+            (a.clone(), &args[1..])
+        }
         _ => ("agent.3md".to_string(), args),
     }
 }
@@ -341,9 +404,17 @@ fn main() {
     match cmd.as_str() {
         "manifest" => {
             let (doc, skills) = load(&file);
-            let name = doc.title.clone().or_else(|| doc.metadata.get("agent").cloned()).unwrap_or_default();
+            let name = doc
+                .title
+                .clone()
+                .or_else(|| doc.metadata.get("agent").cloned())
+                .unwrap_or_default();
             let model = doc.metadata.get("model").cloned().unwrap_or_default();
-            let tools = doc.metadata.get("tools").cloned().unwrap_or_else(|| "(none)".into());
+            let tools = doc
+                .metadata
+                .get("tools")
+                .cloned()
+                .unwrap_or_else(|| "(none)".into());
             println!("{name}  ({model})");
             if let Some(p) = doc.metadata.get("persona") {
                 println!("  persona: {p}");
@@ -351,7 +422,11 @@ fn main() {
             println!("  tools:   {tools}");
             println!("  skills:  {}", skills.len());
             for s in &skills {
-                let cost = s.cost.as_ref().map(|c| format!(" [{c}]")).unwrap_or_default();
+                let cost = s
+                    .cost
+                    .as_ref()
+                    .map(|c| format!(" [{c}]"))
+                    .unwrap_or_default();
                 println!("    - {}{}", s.name, cost);
                 println!("        triggers: {}", s.triggers.join(", "));
             }
@@ -377,10 +452,22 @@ fn main() {
             println!("request: \"{text}\"");
             for (i, (s, hits)) in ranked.iter().enumerate() {
                 let tag = if i == 0 { "->" } else { "  " };
-                println!("  {tag} {}  (score {}; matched: {})", s.name, hits.len(), hits.join(", "));
+                println!(
+                    "  {tag} {}  (score {}; matched: {})",
+                    s.name,
+                    hits.len(),
+                    hits.join(", ")
+                );
             }
             let chain = resolve(&skills, &ranked[0].0.name);
-            println!("  loads: {}", chain.iter().map(|s| s.name.as_str()).collect::<Vec<_>>().join(" + "));
+            println!(
+                "  loads: {}",
+                chain
+                    .iter()
+                    .map(|s| s.name.as_str())
+                    .collect::<Vec<_>>()
+                    .join(" + ")
+            );
         }
         "get" => {
             let name = rest.join(" ");
@@ -392,8 +479,16 @@ fn main() {
             match get(&skills, name) {
                 None => fail(&format!("no such skill: {name}")),
                 Some(s) => {
-                    let cost = s.cost.as_ref().map(|c| format!(", cost={c}")).unwrap_or_default();
-                    let inputs = if s.inputs.is_empty() { String::new() } else { format!(", inputs={}", s.inputs.join("/")) };
+                    let cost = s
+                        .cost
+                        .as_ref()
+                        .map(|c| format!(", cost={c}"))
+                        .unwrap_or_default();
+                    let inputs = if s.inputs.is_empty() {
+                        String::new()
+                    } else {
+                        format!(", inputs={}", s.inputs.join("/"))
+                    };
                     println!("# {}  (z={}{}{})", s.name, s.z, cost, inputs);
                     println!("{}", s.body);
                 }
@@ -412,19 +507,35 @@ fn main() {
             let chain = resolve(&skills, name);
             println!("{name} loads {} plane(s):", chain.len());
             for s in &chain {
-                let deps = if s.deps.is_empty() { String::new() } else { format!("  (-> {})", s.deps.iter().map(|d| d.to_string()).collect::<Vec<_>>().join(",")) };
+                let deps = if s.deps.is_empty() {
+                    String::new()
+                } else {
+                    format!(
+                        "  (-> {})",
+                        s.deps
+                            .iter()
+                            .map(|d| d.to_string())
+                            .collect::<Vec<_>>()
+                            .join(",")
+                    )
+                };
                 println!("  - {}{}", s.name, deps);
             }
         }
         "validate" => {
             let src = match std::fs::read_to_string(&file) {
                 Ok(s) => s,
-                Err(_) => { eprintln!("cannot read {file}"); exit(2); }
+                Err(_) => {
+                    eprintln!("cannot read {file}");
+                    exit(2);
+                }
             };
             let doc = match parse(&src) {
                 Ok(d) => d,
                 Err(e) => {
-                    println!("agent3md validate: {file}\n  x [parse]  not valid 3md: {e:?}\n  FAIL");
+                    println!(
+                        "agent3md validate: {file}\n  x [parse]  not valid 3md: {e:?}\n  FAIL"
+                    );
                     exit(1);
                 }
             };
@@ -439,7 +550,12 @@ fn main() {
                 println!("  ! [{}]{}  {}", w.rule, z, w.msg);
             }
             let ok = errors.is_empty();
-            println!("  {} — {} error(s), {} warning(s)", if ok { "PASS" } else { "FAIL" }, errors.len(), warnings.len());
+            println!(
+                "  {} — {} error(s), {} warning(s)",
+                if ok { "PASS" } else { "FAIL" },
+                errors.len(),
+                warnings.len()
+            );
             exit(if ok { 0 } else { 1 });
         }
         other => fail(&format!("unknown command: {other}")),
