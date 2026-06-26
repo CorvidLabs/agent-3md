@@ -23,6 +23,13 @@ jobs:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
           scope: "@corvidlabs"
+      # OIDC trusted publishing needs npm >= 11.5.1; Node 20 ships npm 10, which
+      # can sign provenance but cannot authenticate via OIDC (the publish then
+      # 404s as unauthenticated). Upgrade npm before publishing.
+      - name: Upgrade npm for OIDC trusted publishing
+        run: |
+          npm install -g npm@latest
+          npm --version
       - run: bun install --frozen-lockfile
       - name: Sync version to the release tag
         if: github.event_name == 'release'
