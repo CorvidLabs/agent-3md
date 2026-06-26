@@ -12,10 +12,15 @@ instead of stuffing every skill into context.
 
 ## Quickstart (2 minutes)
 
-**Use the library.** It's on GitHub Packages. That registry needs a token even
-for public packages, so create a classic personal access token with the
-`read:packages` scope, then point the `@corvidlabs` scope at the registry and
-install:
+There are two ways in, by design. **TypeScript is the reference implementation**,
+the package you embed in an agent; it carries the spec, the validator, and the
+MCP server. **Rust is the default native CLI**, a single fast binary for the
+command line with no runtime to install.
+
+**Embed the library (TypeScript, the default for code).** It's on GitHub
+Packages. That registry needs a token even for public packages, so create a
+classic personal access token with the `read:packages` scope, then point the
+`@corvidlabs` scope at the registry and install:
 
 ```sh
 printf '@corvidlabs:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT\n' > .npmrc
@@ -31,6 +36,16 @@ console.log(validateAgent(src).ok);                  // true
 const agent = new Agent(src);
 console.log(agent.route("summarize this")[0].skill.name);  // -> "summarize"
 const skill = agent.get("summarize");                // load ONE skill on demand
+```
+
+**Install the CLI (Rust, the default for the command line).** A fast native
+binary, nothing to run it on top of:
+
+```sh
+cargo install agent3md
+agent3md route agent.3md "find the latest release notes"
+agent3md get agent.3md summarize        # load one skill on demand
+agent3md validate agent.3md             # exit non-zero on errors
 ```
 
 **Or scaffold and drive it from this repo:**
@@ -116,5 +131,5 @@ in TypeScript, Rust, and Swift, a validator with conformance vectors, a CLI, an
 MCP server, and a JSON projection. It is a proposed format with no external users
 yet, so treat it as a proof of concept you can build on. It was put through an
 adversarial review; see [`docs/ROADMAP-1.0.md`](./docs/ROADMAP-1.0.md) for the
-findings and what 1.0.0 needs (crates.io publish to drop Rust vendoring, typed
-skill inputs, tool bindings, and real adopters).
+findings and what 1.0.0 still needs (typed skill inputs, tool bindings, and real
+adopters).

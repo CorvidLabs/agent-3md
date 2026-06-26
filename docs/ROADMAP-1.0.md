@@ -46,6 +46,10 @@ taking them on faith. This doc records what they found, what is fixed, and what
 - **Parser hardening shipped upstream** (CorvidLabs/3md#42): parsed frontmatter
   and `@plane` attribute maps are now null-prototype, so untrusted keys like
   `constructor` can never land on a prototype. Re-vendored here (v0.2.1).
+- **Native CLI published to crates.io** ([`agent3md`](https://crates.io/crates/agent3md)
+  v0.1.0): `cargo install agent3md` gives a single fast binary with no runtime,
+  the default for the command line. TypeScript stays the reference library that
+  carries the spec, validator, and MCP server.
 
 ## Still needed for 1.0.0
 

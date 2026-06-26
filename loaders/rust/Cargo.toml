@@ -1,8 +1,14 @@
 [package]
-name = "agent3md-loader"
+name = "agent3md"
 version = "0.1.0"
 edition = "2021"
-description = "agent3md - a native CLI over any agent.3md file, on the canonical threemd parser."
+description = "A fast native CLI over any agent.3md file: route, get, resolve, and validate the skills of a 3md-packaged agent."
+license = "MIT"
+repository = "https://github.com/CorvidLabs/agent-3md"
+homepage = "https://corvidlabs.xyz/3md"
+readme = "README.md"
+keywords = ["agent", "3md", "cli", "skills", "mcp"]
+categories = ["command-line-utilities", "parsing"]
 
 [[bin]]
 name = "agent3md"
