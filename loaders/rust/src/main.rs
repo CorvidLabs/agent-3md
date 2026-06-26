@@ -304,12 +304,13 @@ fn fail(msg: &str) -> ! {
     exit(1);
 }
 
-/// If the next arg looks like a file (ends `.3md` or exists), use it; else default.
+/// If the next arg looks like a file (ends `.3md` or exists), use it; else fall
+/// back to `agent.3md` in the current directory (the natural default once the
+/// binary is installed with `cargo install agent3md`).
 fn split_file(args: &[String]) -> (String, &[String]) {
-    let default = concat!(env!("CARGO_MANIFEST_DIR"), "/../../agent.3md").to_string();
     match args.first() {
         Some(a) if a.ends_with(".3md") || std::path::Path::new(a).exists() => (a.clone(), &args[1..]),
-        _ => (default, args),
+        _ => ("agent.3md".to_string(), args),
     }
 }
 
