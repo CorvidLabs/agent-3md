@@ -1,14 +1,15 @@
 ---
 3md: 1.0
-title: Typed
-model: claude-opus-4-8
+axis: skill
+agent: typed
+tools: db
 ---
-@plane z=0 label="Typed" kind=identity
-# Typed
-Identity.
+@plane z=0 label="typed" kind=identity
+# typed
+Identity. No model line: model is an optional hint, not required.
 
-@plane z=1 label="query" kind=skill triggers="ask, lookup" inputs="question:string, limit:number?" tool="db.query"
+@plane z=1 label="query" kind=skill triggers="ask, lookup" inputs="question:string, limit:number?" tool="db query {question} --limit {limit}"
 # Skill: query
-Typed inputs (a required string and an optional number) plus a tool binding.
-RULE: valid. A bare name still means a required string, so this stays
-backward-compatible with the older untyped form.
+Typed inputs, including an optional number (`limit:number?`). The command uses
+both placeholders, the binary `db` is declared in `tools`, and a bare name would
+mean a required string. RULE: valid (no warnings).
