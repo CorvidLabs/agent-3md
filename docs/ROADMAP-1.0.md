@@ -63,9 +63,9 @@ taking them on faith. This doc records what they found, what is fixed, and what
   `npm install @corvidlabs/agent3md` needs no token or `.npmrc`. The release
   workflow publishes with provenance via npm Trusted Publishers (OIDC).
 - **Hosted docs**: full documentation at corvidlabs.xyz/agent-3md/docs/.
+- **Native loader conformance tests**: Both the Rust loader (via cargo test) and the Swift loader (via XCTest) now run native tests against the conformance vectors, fully verified on every run of the verify lane.
 
 ## Still needed for 1.0.0
 
-- Real external adopters. Until then this is a proposed format, not a standard,
-  so the package stays on the 0.x line.
+- Real external adopters. Until then this is a proposed format, not a standard, so the package stays on the 0.x line.
 - Real external adopters. Until then this is a proposed format, not a standard.
