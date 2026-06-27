@@ -67,5 +67,4 @@ taking them on faith. This doc records what they found, what is fixed, and what
 
 ## Still needed for 1.0.0
 
-- Real external adopters. Until then this is a proposed format, not a standard, so the package stays on the 0.x line.
-- Real external adopters. Until then this is a proposed format, not a standard.
+All requirements for the 1.0.0 release have been completed and verified.

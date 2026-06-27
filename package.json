@@ -1,6 +1,6 @@
 {
   "name": "@corvidlabs/agent3md",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "agent.3md: one 3md file is a whole agent (identity + on-demand skills). Loader, validator, router, and MCP-ready, on the canonical 3md parser.",
   "type": "module",
   "license": "MIT",

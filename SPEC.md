@@ -1,7 +1,7 @@
 # The `agent.3md` Standard
 
 **Version:** `agent3md/1`
-**Status:** draft
+**Status:** standard
 **Base format:** [3md](https://corvidlabs.github.io/3md/) `3md: 1.0`
 
 An `agent.3md` file is a complete agent in one plain-text document: its identity

@@ -1,6 +1,6 @@
 [package]
 name = "agent3md"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 description = "A fast native CLI over any agent.3md file: route, get, resolve, and validate the skills of a 3md-packaged agent."
 license = "MIT"
