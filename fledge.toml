@@ -19,9 +19,9 @@ dir = "loaders/rust"
 description = "Rust agent3md CLI: format check, clippy (deny warnings), and tests."
 
 [tasks.swift]
-cmd = "swift build"
+cmd = "swift test"
 dir = "loaders/swift"
-description = "Swift loader builds on the canonical ThreeMD package (proves the format ports)."
+description = "Swift loader tests run on the canonical ThreeMD package (proves the format ports)."
 
 [tasks.spec]
 cmd = "fledge spec check"

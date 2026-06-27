@@ -288,6 +288,7 @@ fn resolve<'a>(skills: &'a [Skill], name: &str) -> Vec<&'a Skill> {
 }
 
 // --- agent3md/1 conformance checks (mirror src/validate.ts) ---
+#[derive(Debug)]
 struct Issue {
     rule: &'static str,
     msg: String,
@@ -875,5 +876,157 @@ fn main() {
             exit(if ok { 0 } else { 1 });
         }
         other => fail(&format!("unknown command: {other}")),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    fn check_valid(path: &str) {
+        let src = fs::read_to_string(path).unwrap_or_else(|e| panic!("failed to read {path}: {e}"));
+        let doc = parse(&src).expect("valid 3md document failed parsing");
+        let (errors, _warnings) = validate(&doc);
+        assert!(
+            errors.is_empty(),
+            "expected zero errors for {path}, got {errors:?}"
+        );
+    }
+
+    fn check_invalid(path: &str, expected_rule: &str) {
+        let src = fs::read_to_string(path).unwrap_or_else(|e| panic!("failed to read {path}: {e}"));
+        let doc_res = parse(&src);
+        if doc_res.is_err() {
+            assert_eq!(
+                expected_rule, "parse",
+                "expected parsing error for {path}, but got parse error instead of {expected_rule}"
+            );
+            return;
+        }
+        let doc = doc_res.unwrap();
+        let (errors, _warnings) = validate(&doc);
+        assert!(!errors.is_empty(), "expected errors for {path}, got none");
+        let rules: Vec<&str> = errors.iter().map(|e| e.rule).collect();
+        assert!(
+            rules.contains(&expected_rule),
+            "expected error rule {expected_rule} for {path}, got {rules:?}"
+        );
+    }
+
+    #[test]
+    fn test_real_agent_3md() {
+        check_valid("../../agent.3md");
+    }
+
+    #[test]
+    fn test_valid_minimal() {
+        check_valid("../../examples/conformance/valid-minimal.3md");
+    }
+
+    #[test]
+    fn test_valid_deps() {
+        check_valid("../../examples/conformance/valid-deps.3md");
+    }
+
+    #[test]
+    fn test_valid_cost() {
+        check_valid("../../examples/conformance/valid-cost.3md");
+    }
+
+    #[test]
+    fn test_valid_entry() {
+        check_valid("../../examples/conformance/valid-entry.3md");
+    }
+
+    #[test]
+    fn test_valid_fallback_identity() {
+        check_valid("../../examples/conformance/valid-fallback-identity.3md");
+    }
+
+    #[test]
+    fn test_valid_typed_inputs() {
+        check_valid("../../examples/conformance/valid-typed-inputs.3md");
+    }
+
+    #[test]
+    fn test_valid_command() {
+        check_valid("../../examples/conformance/valid-command.3md");
+    }
+
+    #[test]
+    fn test_invalid_two_identities() {
+        check_invalid(
+            "../../examples/conformance/invalid-two-identities.3md",
+            "identity",
+        );
+    }
+
+    #[test]
+    fn test_invalid_missing_label() {
+        check_invalid(
+            "../../examples/conformance/invalid-missing-label.3md",
+            "missing-label",
+        );
+    }
+
+    #[test]
+    fn test_invalid_dup_skill() {
+        check_invalid("../../examples/invalid/dup-skill.3md", "unique-skill");
+        check_invalid(
+            "../../examples/conformance/invalid-dup-skill.3md",
+            "unique-skill",
+        );
+    }
+
+    #[test]
+    fn test_invalid_dead_link() {
+        check_invalid("../../examples/invalid/dead-link.3md", "dead-link");
+        check_invalid(
+            "../../examples/conformance/invalid-dead-link.3md",
+            "dead-link",
+        );
+    }
+
+    #[test]
+    fn test_invalid_cycle() {
+        check_invalid("../../examples/conformance/invalid-cycle.3md", "cycle");
+    }
+
+    #[test]
+    fn test_invalid_missing_frontmatter() {
+        check_invalid(
+            "../../examples/conformance/invalid-missing-frontmatter.3md",
+            "frontmatter",
+        );
+    }
+
+    #[test]
+    fn test_invalid_bad_entry() {
+        check_invalid("../../examples/conformance/invalid-bad-entry.3md", "entry");
+    }
+
+    #[test]
+    fn test_invalid_bad_input_type() {
+        check_invalid(
+            "../../examples/conformance/invalid-bad-input-type.3md",
+            "input-type",
+        );
+    }
+
+    #[test]
+    fn test_invalid_dup_input() {
+        check_invalid(
+            "../../examples/conformance/invalid-dup-input.3md",
+            "dup-input",
+        );
+    }
+
+    #[test]
+    fn test_invalid_bad_placeholder() {
+        check_invalid(
+            "../../examples/conformance/invalid-bad-placeholder.3md",
+            "tool-input",
+        );
     }
 }
