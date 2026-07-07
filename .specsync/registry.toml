@@ -3,3 +3,11 @@ name = "agent-3md"
 
 [specs]
 runtime = "specs/runtime/runtime.spec.md"
+threemd = "specs/threemd/threemd.spec.md"
+validation = "specs/validation/validation.spec.md"
+cli = "specs/cli/cli.spec.md"
+mcp = "specs/mcp/mcp.spec.md"
+export = "specs/export/export.spec.md"
+package = "specs/package/package.spec.md"
+loader-rust = "specs/loader-rust/loader-rust.spec.md"
+loader-swift = "specs/loader-swift/loader-swift.spec.md"
