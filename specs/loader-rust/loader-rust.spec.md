@@ -6,7 +6,7 @@ files:
   - loaders/rust/src/main.rs
 
 db_tables: []
-depends_on: []
+depends_on: [threemd]
 ---
 
 # Rust Loader

@@ -4,16 +4,17 @@ spec: package.spec.md
 
 ## User Stories
 
-- As a developer, I want to <!-- describe the goal -->
+- As an npm module consumer, I want to import `Agent` and other helpers in my project.
 
 ## Acceptance Criteria
 
-- <!-- List measurable acceptance criteria. -->
+- Export `Agent`, `fillCommand`, `commandPlaceholders`.
+- Export `routeQuery` from `index-query.ts`.
 
 ## Constraints
 
-- <!-- List any constraints or limitations. -->
+- Ensure builds emit valid `.d.ts` type declarations.
 
 ## Out of Scope
 
-- <!-- List anything explicitly excluded. -->
+- Packaging node binary wrappers.

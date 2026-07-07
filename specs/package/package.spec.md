@@ -7,7 +7,7 @@ files:
   - src/index-query.ts
 
 db_tables: []
-depends_on: []
+depends_on: [runtime, validation]
 ---
 
 # Package

@@ -4,10 +4,11 @@ spec: validation.spec.md
 
 ## Test Plan
 
-### Unit Tests
+## Unit Tests
 
-- <!-- List unit test scenarios. -->
+- Test each validation rule with custom invalid fixtures.
+- Assert validation reports correct line numbers.
 
-### Integration Tests
+## Integration Tests
 
-- <!-- List integration test scenarios. -->
+- Run validator in strict mode against all valid conformance fixtures.

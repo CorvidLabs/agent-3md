@@ -4,12 +4,12 @@ spec: package.spec.md
 
 ## Context
 
-<!-- Describe the context and motivation for this module. -->
+The package module defines the library entry points of the `@corvidlabs/agent3md` npm package.
 
 ## Related Modules
 
-- <!-- List related modules or specs. -->
+- [runtime.spec.md](../runtime/runtime.spec.md): Re-exports runtime functionality.
 
 ## Design Decisions
 
-- <!-- Document key design decisions and their rationale. -->
+- **Separate Helper**: Place `routeQuery` helper in `index-query.ts` to allow light import paths.

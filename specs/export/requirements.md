@@ -4,16 +4,18 @@ spec: export.spec.md
 
 ## User Stories
 
-- As a developer, I want to <!-- describe the goal -->
+- As an API client, I want to export the agent's catalog in standard JSON format.
 
 ## Acceptance Criteria
 
-- <!-- List measurable acceptance criteria. -->
+- Output valid JSON representation of `AgentManifest`.
+- Include skill metadata (triggers, tools, costs, inputs).
+- Conditionally include bodies based on CLI flag.
 
 ## Constraints
 
-- <!-- List any constraints or limitations. -->
+- Print output directly to stdout.
 
 ## Out of Scope
 
-- <!-- List anything explicitly excluded. -->
+- Uploading manifest directly to a remote endpoint.

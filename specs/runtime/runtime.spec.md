@@ -6,7 +6,7 @@ files:
   - src/runtime.ts
 
 db_tables: []
-depends_on: []
+depends_on: [threemd]
 ---
 
 # Runtime

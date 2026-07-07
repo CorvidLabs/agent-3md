@@ -4,6 +4,6 @@ spec: package.spec.md
 
 ## Tasks
 
-- [ ] Write spec
-- [ ] Implement module
-- [ ] Write tests
+- [x] Write spec
+- [x] Set up package build configuration
+- [ ] Verify typescript compilation flags

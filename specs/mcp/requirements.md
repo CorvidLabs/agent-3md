@@ -4,16 +4,18 @@ spec: mcp.spec.md
 
 ## User Stories
 
-- As a developer, I want to <!-- describe the goal -->
+- As an LLM client, I want to connect to the agent-3md MCP server and call its skills as tools.
 
 ## Acceptance Criteria
 
-- <!-- List measurable acceptance criteria. -->
+- Implement `tools/list` to expose the agent's catalog.
+- Implement `tools/call` to route and execute commands.
+- Provide a robust self-test suite.
 
 ## Constraints
 
-- <!-- List any constraints or limitations. -->
+- Must conform to the MCP protocol specification.
 
 ## Out of Scope
 
-- <!-- List anything explicitly excluded. -->
+- HTTP/Websocket transports.

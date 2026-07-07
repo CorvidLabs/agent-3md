@@ -4,6 +4,6 @@ spec: validation.spec.md
 
 ## Tasks
 
-- [ ] Write spec
-- [ ] Implement module
-- [ ] Write tests
+- [x] Write spec
+- [x] Implement TS validator rules
+- [x] Write validation unit tests

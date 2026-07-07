@@ -4,12 +4,12 @@ spec: cli.spec.md
 
 ## Context
 
-<!-- Describe the context and motivation for this module. -->
+The cli module provides a command-line interface for operators to inspect, route, and execute skills packaged in an agent.3md file directly from the terminal.
 
 ## Related Modules
 
-- <!-- List related modules or specs. -->
+- [runtime.spec.md](../runtime/runtime.spec.md): Backs CLI commands with runtime queries.
 
 ## Design Decisions
 
-- <!-- Document key design decisions and their rationale. -->
+- **Zero-Dependency CLI Parsing**: Use basic node process argument parsing to avoid third-party dependencies.

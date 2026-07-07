@@ -4,12 +4,12 @@ spec: loader-swift.spec.md
 
 ## Context
 
-<!-- Describe the context and motivation for this module. -->
+The loader-swift module is the Swift port, verifying that agent-3md is fully portable to native macOS/iOS environments.
 
 ## Related Modules
 
-- <!-- List related modules or specs. -->
+- [runtime.spec.md](../runtime/runtime.spec.md): TS loader mirrored by this port.
 
 ## Design Decisions
 
-- <!-- Document key design decisions and their rationale. -->
+- **Sendable Models**: Ensure all structures conform to `Sendable` to be safe under Swift concurrency.

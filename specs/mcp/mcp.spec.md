@@ -7,7 +7,7 @@ files:
   - src/mcp-selftest.ts
 
 db_tables: []
-depends_on: []
+depends_on: [runtime]
 ---
 
 # MCP

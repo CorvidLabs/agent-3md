@@ -4,12 +4,12 @@ spec: threemd.spec.md
 
 ## Context
 
-<!-- Describe the context and motivation for this module. -->
+The threemd module parses three-dimensional markdown (3md) documents, splitting the document by horizontal rules (planes) and parsing attributes out of the markdown headings.
 
 ## Related Modules
 
-- <!-- List related modules or specs. -->
+- [runtime.spec.md](../runtime/runtime.spec.md): Consumes parsed planes to index skills.
 
 ## Design Decisions
 
-- <!-- Document key design decisions and their rationale. -->
+- **Markdown-First**: Keep parsing logic lightweight and focused solely on headers and horizontal rules.

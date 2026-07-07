@@ -4,10 +4,10 @@ spec: export.spec.md
 
 ## Test Plan
 
-### Unit Tests
+## Unit Tests
 
-- <!-- List unit test scenarios. -->
+- Assert output JSON matches expected schema.
 
-### Integration Tests
+## Integration Tests
 
-- <!-- List integration test scenarios. -->
+- Verify output when running against conformance fixtures.

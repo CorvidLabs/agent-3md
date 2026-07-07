@@ -4,6 +4,6 @@ spec: mcp.spec.md
 
 ## Tasks
 
-- [ ] Write spec
-- [ ] Implement module
-- [ ] Write tests
+- [x] Write spec
+- [x] Implement JSON-RPC parsing and tools list/call
+- [x] Implement self-test client verification

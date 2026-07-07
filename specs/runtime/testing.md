@@ -4,10 +4,12 @@ spec: runtime.spec.md
 
 ## Test Plan
 
-### Unit Tests
+## Unit Tests
 
-- <!-- List unit test scenarios. -->
+- Verify constructors on valid/invalid inputs.
+- Test `route` rankings on varying queries.
+- Test cyclic dependency loop breaking.
 
-### Integration Tests
+## Integration Tests
 
-- <!-- List integration test scenarios. -->
+- Verify complete routing and command execution using real skill definitions.
