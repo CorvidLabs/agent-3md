@@ -1,0 +1,20 @@
+# Atlas coverage scope for agent-3md.
+#
+# The specs govern the runtime source (src/ and the language loaders), not the
+# examples, docs, or generated build output. Keep those out of the coverage
+# denominator. Root-anchored subset of gitignore.
+
+# Examples, docs, and colocated unit tests (verified against specs, not governed;
+# atlas honors exact paths and directories, not compound *.test.ts globs).
+examples/
+docs/
+src/validate.test.ts
+
+# Build output / vendored / generated.
+node_modules/
+dist/
+build/
+.build/
+target/
+*.d.ts
+*.min.*
