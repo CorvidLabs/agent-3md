@@ -3,6 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/@corvidlabs/agent3md.svg)](https://www.npmjs.com/package/@corvidlabs/agent3md)
 [![crates.io version](https://img.shields.io/crates/v/agent3md.svg)](https://crates.io/crates/agent3md)
 [![CI Build Status](https://github.com/CorvidLabs/agent-3md/actions/workflows/trust.yml/badge.svg)](https://github.com/CorvidLabs/agent-3md/actions)
+[![spec coverage](https://img.shields.io/endpoint?url=https://corvidlabs.github.io/agent-3md/badges/coverage.json)](https://corvidlabs.github.io/agent-3md/)
 [![Spec Status](https://img.shields.io/badge/spec-standard-brightgreen)](SPEC.md)
 [![License](https://img.shields.io/github/license/CorvidLabs/agent-3md)](LICENSE)
 
