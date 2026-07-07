@@ -60,14 +60,14 @@ jobs:
 
       # Risk: enforced, deterministic, low false-positive.
       - name: Augur risk gate
-        uses: CorvidLabs/augur@v0.4.0
+        uses: CorvidLabs/augur@v1.0.0
         with:
           range: origin/main..HEAD
           threshold: block
 
       # Trust: soft until a signing key and richer policy land.
       - name: Attest verify
-        uses: CorvidLabs/attest@v0.4.0
+        uses: CorvidLabs/attest@v1.0.0
         with:
           range: origin/main..HEAD
           policy: .attest.json
