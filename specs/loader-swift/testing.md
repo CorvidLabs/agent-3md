@@ -4,10 +4,11 @@ spec: loader-swift.spec.md
 
 ## Test Plan
 
-### Unit Tests
+## Unit Tests
 
-- <!-- List unit test scenarios. -->
+- Test NSRegularExpression patterns for placeholders.
+- Verify `tokenize` on various strings.
 
-### Integration Tests
+## Integration Tests
 
-- <!-- List integration test scenarios. -->
+- Run XCTest suite matching Swift and TS behaviors.

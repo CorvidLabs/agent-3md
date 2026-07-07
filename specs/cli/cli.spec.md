@@ -6,7 +6,7 @@ files:
   - src/cli.ts
 
 db_tables: []
-depends_on: []
+depends_on: [runtime]
 ---
 
 # CLI

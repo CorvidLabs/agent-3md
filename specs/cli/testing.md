@@ -4,10 +4,11 @@ spec: cli.spec.md
 
 ## Test Plan
 
-### Unit Tests
+## Unit Tests
 
-- <!-- List unit test scenarios. -->
+- Parse process arguments and verify flag extraction.
+- Verify path resolution rules.
 
-### Integration Tests
+## Integration Tests
 
-- <!-- List integration test scenarios. -->
+- Execute the CLI as a separate shell command and assert stdout/stderr and exit codes.

@@ -9,7 +9,7 @@ files:
   - loaders/swift/Tests/Agent3MDTests/Agent3MDTests.swift
 
 db_tables: []
-depends_on: []
+depends_on: [threemd]
 ---
 
 # Swift Loader

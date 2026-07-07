@@ -4,6 +4,6 @@ spec: loader-rust.spec.md
 
 ## Tasks
 
-- [ ] Write spec
-- [ ] Implement module
-- [ ] Write tests
+- [x] Write spec
+- [x] Write Rust agent parser and loader
+- [x] Write Rust clippy and formatting checks

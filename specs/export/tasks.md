@@ -4,6 +4,6 @@ spec: export.spec.md
 
 ## Tasks
 
-- [ ] Write spec
-- [ ] Implement module
-- [ ] Write tests
+- [x] Write spec
+- [x] Implement JSON manifest exporter utility
+- [ ] Verify json formatting behavior

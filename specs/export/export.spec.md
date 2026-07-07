@@ -6,7 +6,7 @@ files:
   - src/export.ts
 
 db_tables: []
-depends_on: []
+depends_on: [runtime]
 ---
 
 # Export

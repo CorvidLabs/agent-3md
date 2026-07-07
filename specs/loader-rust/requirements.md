@@ -4,16 +4,18 @@ spec: loader-rust.spec.md
 
 ## User Stories
 
-- As a developer, I want to <!-- describe the goal -->
+- As a Rust developer, I want a fast binary to validate and execute agents without Node/Bun.
 
 ## Acceptance Criteria
 
-- <!-- List measurable acceptance criteria. -->
+- Parse 3md structures using native Rust structures.
+- Implement matching trigger routing logic.
+- Mirror validation rules exactly.
 
 ## Constraints
 
-- <!-- List any constraints or limitations. -->
+- Must compile on stable Cargo rustc.
 
 ## Out of Scope
 
-- <!-- List anything explicitly excluded. -->
+- Implementing an MCP stdio server in Rust.

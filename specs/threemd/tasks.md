@@ -4,6 +4,6 @@ spec: threemd.spec.md
 
 ## Tasks
 
-- [ ] Write spec
-- [ ] Implement module
-- [ ] Write tests
+- [x] Write spec
+- [x] Vendor canonical parser into TS codebase
+- [ ] Verify plane boundary splitting logic

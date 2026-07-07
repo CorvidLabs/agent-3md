@@ -4,6 +4,6 @@ spec: cli.spec.md
 
 ## Tasks
 
-- [ ] Write spec
-- [ ] Implement module
-- [ ] Write tests
+- [x] Write spec
+- [x] Implement command dispatch in CLI
+- [ ] Test shell-execution command wrapper

@@ -4,10 +4,10 @@ spec: mcp.spec.md
 
 ## Test Plan
 
-### Unit Tests
+## Unit Tests
 
-- <!-- List unit test scenarios. -->
+- Validate JSON-RPC request and response payload matching.
 
-### Integration Tests
+## Integration Tests
 
-- <!-- List integration test scenarios. -->
+- Run `mcp-selftest.ts` to simulate client connections and confirm message exchange.

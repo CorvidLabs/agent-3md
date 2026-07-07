@@ -4,10 +4,10 @@ spec: package.spec.md
 
 ## Test Plan
 
-### Unit Tests
+## Unit Tests
 
-- <!-- List unit test scenarios. -->
+- Import functions from built package and test outputs.
 
-### Integration Tests
+## Integration Tests
 
-- <!-- List integration test scenarios. -->
+- Run build lane and verify presence of output files.

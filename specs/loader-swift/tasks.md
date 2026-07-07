@@ -4,6 +4,6 @@ spec: loader-swift.spec.md
 
 ## Tasks
 
-- [ ] Write spec
-- [ ] Implement module
-- [ ] Write tests
+- [x] Write spec
+- [x] Implement Swift models and parsing
+- [x] Create SwiftPM Package and tests

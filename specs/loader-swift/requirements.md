@@ -4,16 +4,18 @@ spec: loader-swift.spec.md
 
 ## User Stories
 
-- As a developer, I want to <!-- describe the goal -->
+- As an iOS or macOS developer, I want a native Swift package to load and query agent configurations.
 
 ## Acceptance Criteria
 
-- <!-- List measurable acceptance criteria. -->
+- Provide `Agent`, `Skill`, and `SkillInput` types conforming to `Sendable`.
+- Mirror routing, inputs, and commands exactly.
+- Build via SwiftPM manifest.
 
 ## Constraints
 
-- <!-- List any constraints or limitations. -->
+- Support Swift 6 concurrency rules.
 
 ## Out of Scope
 
-- <!-- List anything explicitly excluded. -->
+- Custom UI components.

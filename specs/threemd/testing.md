@@ -4,10 +4,12 @@ spec: threemd.spec.md
 
 ## Test Plan
 
-### Unit Tests
+## Unit Tests
 
-- <!-- List unit test scenarios. -->
+- Parse empty 3md document.
+- Parse single plane with metadata.
+- Parse multiple planes and verify correct `z` sorting.
 
-### Integration Tests
+## Integration Tests
 
-- <!-- List integration test scenarios. -->
+- Verify parsing of all conformance examples.
