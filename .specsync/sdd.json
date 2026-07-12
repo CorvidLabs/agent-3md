@@ -25,14 +25,18 @@
     ".specsync/sdd.json",
     ".specsync/config.toml",
     ".specsync/config.json",
-    ".specsync/version"
+    ".specsync/version",
+    "loaders/rust/",
+    "loaders/swift/",
+    "SPEC.md",
+    "examples/conformance/"
   ],
   "ignored_paths": [
     ".specsync/",
     "specs/"
   ],
   "verification_commands": [
-    "bun test"
+    "fledge lanes run verify"
   ],
   "custom_artifacts": {},
   "principles_file": null

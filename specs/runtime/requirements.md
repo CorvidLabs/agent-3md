@@ -10,28 +10,28 @@ spec: runtime.spec.md
 
 ### REQ-runtime-001
 
-The implementation SHALL satisfy this requirement.
+The constructor SHALL locate the identity plane and catalog all skills.
 
 Acceptance Criteria
 
 - Constructor must locate the identity plane and catalog all skills.
 ### REQ-runtime-002
 
-The implementation SHALL satisfy this requirement.
+The `route` method SHALL rank skills by trigger match count, breaking ties by lower z.
 
 Acceptance Criteria
 
 - The `route` method must rank skills by trigger match count, breaking ties by lower z.
 ### REQ-runtime-003
 
-The implementation SHALL satisfy this requirement.
+The `resolve` method SHALL resolve transitive dependencies in execution order.
 
 Acceptance Criteria
 
 - The `resolve` method must resolve transitive dependencies in execution order.
 ### REQ-runtime-004
 
-The implementation SHALL satisfy this requirement.
+The `command` method SHALL fill template slots and shell-quote inputs.
 
 Acceptance Criteria
 
