@@ -1,0 +1,11 @@
+{
+  "approvals": [
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783827253,
+      "digest": "0d1dcad56de25e4ff77f1e33ba059aa23feb7688d0164920a26fa488e95d7488",
+      "note": "Authorized by the user-approved CorvidLabs Trust 1 / SpecSync 5 rollout plan."
+    }
+  ]
+}

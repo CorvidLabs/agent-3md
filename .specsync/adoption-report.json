@@ -1,0 +1,60 @@
+{
+  "bootstrap_policy": {
+    "base_commit": "849c1d9652b5304dc8874e0060120b8378a36c74",
+    "digest": "99cbb5bc3c7d14e9a612c30245e39e781e62544685d23cd3269dd95d30c1c294",
+    "path": ".specsync/sdd.json"
+  },
+  "generated_at": 1783826710,
+  "requirements_needing_ids": [
+    {
+      "action": "review and assign one stable ID per durable requirement",
+      "path": "specs/threemd/requirements.md",
+      "suggested_first_id": "REQ-threemd-001"
+    },
+    {
+      "action": "review and assign one stable ID per durable requirement",
+      "path": "specs/harnesses/requirements.md",
+      "suggested_first_id": "REQ-harnesses-001"
+    },
+    {
+      "action": "review and assign one stable ID per durable requirement",
+      "path": "specs/runtime/requirements.md",
+      "suggested_first_id": "REQ-runtime-001"
+    },
+    {
+      "action": "review and assign one stable ID per durable requirement",
+      "path": "specs/mcp/requirements.md",
+      "suggested_first_id": "REQ-mcp-001"
+    },
+    {
+      "action": "review and assign one stable ID per durable requirement",
+      "path": "specs/cli/requirements.md",
+      "suggested_first_id": "REQ-cli-001"
+    },
+    {
+      "action": "review and assign one stable ID per durable requirement",
+      "path": "specs/loader-rust/requirements.md",
+      "suggested_first_id": "REQ-loader-rust-001"
+    },
+    {
+      "action": "review and assign one stable ID per durable requirement",
+      "path": "specs/loader-swift/requirements.md",
+      "suggested_first_id": "REQ-loader-swift-001"
+    },
+    {
+      "action": "review and assign one stable ID per durable requirement",
+      "path": "specs/export/requirements.md",
+      "suggested_first_id": "REQ-export-001"
+    },
+    {
+      "action": "review and assign one stable ID per durable requirement",
+      "path": "specs/validation/requirements.md",
+      "suggested_first_id": "REQ-validation-001"
+    },
+    {
+      "action": "review and assign one stable ID per durable requirement",
+      "path": "specs/package/requirements.md",
+      "suggested_first_id": "REQ-package-001"
+    }
+  ]
+}

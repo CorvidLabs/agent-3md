@@ -6,6 +6,32 @@ spec: export.spec.md
 
 - As an API client, I want to export the agent's catalog in standard JSON format.
 
+## Durable Requirements
+
+### REQ-export-001
+
+The implementation SHALL output valid JSON representation of `AgentManifest`.
+
+Acceptance Criteria
+
+- Output valid JSON representation of `AgentManifest`.
+
+### REQ-export-002
+
+The implementation SHALL include skill metadata (triggers, tools, costs, inputs).
+
+Acceptance Criteria
+
+- Include skill metadata (triggers, tools, costs, inputs).
+
+### REQ-export-003
+
+The implementation SHALL conditionally include bodies based on CLI flag.
+
+Acceptance Criteria
+
+- Conditionally include bodies based on CLI flag.
+
 ## Acceptance Criteria
 
 - Output valid JSON representation of `AgentManifest`.
