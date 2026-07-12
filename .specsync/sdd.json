@@ -29,7 +29,17 @@
     "loaders/rust/",
     "loaders/swift/",
     "SPEC.md",
-    "examples/conformance/"
+    "examples/conformance/",
+    "fledge.toml",
+    ".trust.toml",
+    ".augur.toml",
+    ".attest.json",
+    "AGENTS.md",
+    "CLAUDE.md",
+    ".claude/",
+    ".codex/",
+    ".cursor/",
+    ".gemini/"
   ],
   "ignored_paths": [
     ".specsync/",

@@ -23,14 +23,10 @@ cmd = "swift test"
 dir = "loaders/swift"
 description = "Swift loader tests run on the canonical ThreeMD package (proves the format ports)."
 
-[tasks.spec]
-cmd = "fledge spec check"
-description = "spec-sync: every module spec matches its tracked source files."
-
 [lanes.verify]
-description = "The single CI gate: the TypeScript reference (test + typed build) plus the Rust and Swift loaders and spec-sync."
-steps = ["test", "build", "types", "rust", "swift", "spec"]
+description = "Native verification for the TypeScript reference (test + typed build) and the Rust and Swift loaders. Trust runs SpecSync after this lane."
+steps = ["test", "build", "types", "rust", "swift"]
 
 [lanes.ci]
-description = "Alias for the verify gate."
-steps = ["test", "build", "types", "rust", "swift", "spec"]
+description = "Alias for the native verify lane."
+steps = ["test", "build", "types", "rust", "swift"]
