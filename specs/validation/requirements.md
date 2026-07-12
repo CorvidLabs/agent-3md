@@ -6,54 +6,42 @@ spec: validation.spec.md
 
 - As a developer, I want to validate my agent.3md configuration file during CI/CD to catch structural errors early.
 
-## Durable Requirements
+## Acceptance Criteria
 
 ### REQ-validation-001
 
-The implementation SHALL detect missing agent name.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
 - Detect missing agent name.
-
 ### REQ-validation-002
 
-The implementation SHALL enforce exactly one identity plane.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
 - Enforce exactly one identity plane.
-
 ### REQ-validation-003
 
-The implementation SHALL find duplicate skill labels or inputs.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
 - Find duplicate skill labels or inputs.
-
 ### REQ-validation-004
 
-The implementation SHALL detect dependency cycles.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
 - Detect dependency cycles.
-
 ### REQ-validation-005
 
-The implementation SHALL verify that command placeholders correspond to declared inputs.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
-- Verify that command placeholders correspond to declared inputs.
-
-## Acceptance Criteria
-
-- Detect missing agent name.
-- Enforce exactly one identity plane.
-- Find duplicate skill labels or inputs.
-- Detect dependency cycles.
 - Verify that command placeholders correspond to declared inputs.
 
 ## Constraints

@@ -6,36 +6,28 @@ spec: loader-rust.spec.md
 
 - As a Rust developer, I want a fast binary to validate and execute agents without Node/Bun.
 
-## Durable Requirements
+## Acceptance Criteria
 
 ### REQ-loader-rust-001
 
-The implementation SHALL parse 3md structures using native Rust structures.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
 - Parse 3md structures using native Rust structures.
-
 ### REQ-loader-rust-002
 
-The implementation SHALL implement matching trigger routing logic.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
 - Implement matching trigger routing logic.
-
 ### REQ-loader-rust-003
 
-The implementation SHALL mirror validation rules exactly.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
-- Mirror validation rules exactly.
-
-## Acceptance Criteria
-
-- Parse 3md structures using native Rust structures.
-- Implement matching trigger routing logic.
 - Mirror validation rules exactly.
 
 ## Constraints

@@ -6,36 +6,28 @@ spec: threemd.spec.md
 
 - As a loader, I want to parse a 3md string into structured planes and metadata.
 
-## Durable Requirements
+## Acceptance Criteria
 
 ### REQ-threemd-001
 
-The implementation SHALL split documents on horizontal rules (`---`).
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
 - Split documents on horizontal rules (`---`).
-
 ### REQ-threemd-002
 
-The implementation SHALL extract key-value frontmatter attributes.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
 - Extract key-value frontmatter attributes.
-
 ### REQ-threemd-003
 
-The implementation SHALL parse plane headers to extract attributes like `kind`, `z`, and `label`.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
-- Parse plane headers to extract attributes like `kind`, `z`, and `label`.
-
-## Acceptance Criteria
-
-- Split documents on horizontal rules (`---`).
-- Extract key-value frontmatter attributes.
 - Parse plane headers to extract attributes like `kind`, `z`, and `label`.
 
 ## Constraints

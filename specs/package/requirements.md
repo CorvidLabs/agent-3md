@@ -6,27 +6,21 @@ spec: package.spec.md
 
 - As an npm module consumer, I want to import `Agent` and other helpers in my project.
 
-## Durable Requirements
+## Acceptance Criteria
 
 ### REQ-package-001
 
-The implementation SHALL export `Agent`, `fillCommand`, `commandPlaceholders`.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
 - Export `Agent`, `fillCommand`, `commandPlaceholders`.
-
 ### REQ-package-002
 
-The implementation SHALL export `routeQuery` from `index-query.ts`.
+The implementation SHALL satisfy this requirement.
 
 Acceptance Criteria
 
-- Export `routeQuery` from `index-query.ts`.
-
-## Acceptance Criteria
-
-- Export `Agent`, `fillCommand`, `commandPlaceholders`.
 - Export `routeQuery` from `index-query.ts`.
 
 ## Constraints
