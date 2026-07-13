@@ -8,7 +8,7 @@
   "state": "implementing",
   "base_commit": "849c1d9652b5304dc8874e0060120b8378a36c74",
   "created_at": 1783826867,
-  "updated_at": 1783826959,
+  "updated_at": 1783971300,
   "affected_specs": [],
   "affected_paths": [
     ".github/workflows/trust.yml",

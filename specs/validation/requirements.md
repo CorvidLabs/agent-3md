@@ -10,35 +10,39 @@ spec: validation.spec.md
 
 ### REQ-validation-001
 
-The implementation SHALL satisfy this requirement.
+Validation SHALL report a missing agent name.
 
 Acceptance Criteria
 
 - Detect missing agent name.
+
 ### REQ-validation-002
 
-The implementation SHALL satisfy this requirement.
+Validation SHALL enforce exactly one identity plane.
 
 Acceptance Criteria
 
 - Enforce exactly one identity plane.
+
 ### REQ-validation-003
 
-The implementation SHALL satisfy this requirement.
+Validation SHALL report duplicate skill labels and duplicate inputs.
 
 Acceptance Criteria
 
 - Find duplicate skill labels or inputs.
+
 ### REQ-validation-004
 
-The implementation SHALL satisfy this requirement.
+Validation SHALL detect dependency cycles.
 
 Acceptance Criteria
 
 - Detect dependency cycles.
+
 ### REQ-validation-005
 
-The implementation SHALL satisfy this requirement.
+Validation SHALL require every command placeholder to name a declared input.
 
 Acceptance Criteria
 

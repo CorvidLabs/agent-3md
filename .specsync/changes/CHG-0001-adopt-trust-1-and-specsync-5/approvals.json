@@ -6,6 +6,13 @@
       "timestamp": 1783826959,
       "digest": "9ab781c89737623a87bdc0bd127b2899d04e3138bf1acc9dfb2a4ded9df60e78",
       "note": "Authorized by the user-approved CorvidLabs Trust 1 / SpecSync 5 rollout plan."
+    },
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783971300,
+      "digest": "a946d9c6568428a1f378c45c3df773c7ec46054bddabf9fcb9e8d1cecccfb5ed",
+      "note": "Definition re-approved after native migration verification and final non-semantic requirement corrections; hosted CI and closing acceptance remain pending."
     }
   ]
 }

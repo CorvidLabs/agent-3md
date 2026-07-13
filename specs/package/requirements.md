@@ -10,14 +10,15 @@ spec: package.spec.md
 
 ### REQ-package-001
 
-The implementation SHALL satisfy this requirement.
+The package SHALL export `Agent`, `fillCommand`, and `commandPlaceholders`.
 
 Acceptance Criteria
 
 - Export `Agent`, `fillCommand`, `commandPlaceholders`.
+
 ### REQ-package-002
 
-The implementation SHALL satisfy this requirement.
+The package SHALL export `routeQuery` from `index-query.ts`.
 
 Acceptance Criteria
 

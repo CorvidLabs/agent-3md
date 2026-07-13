@@ -10,21 +10,23 @@ spec: loader-swift.spec.md
 
 ### REQ-loader-swift-001
 
-The implementation SHALL satisfy this requirement.
+The Swift loader SHALL provide `Agent`, `Skill`, and `SkillInput` as `Sendable` types.
 
 Acceptance Criteria
 
 - Provide `Agent`, `Skill`, and `SkillInput` types conforming to `Sendable`.
+
 ### REQ-loader-swift-002
 
-The implementation SHALL satisfy this requirement.
+The Swift loader SHALL mirror reference routing, input, and command behavior.
 
 Acceptance Criteria
 
 - Mirror routing, inputs, and commands exactly.
+
 ### REQ-loader-swift-003
 
-The implementation SHALL satisfy this requirement.
+The Swift loader SHALL build through its SwiftPM manifest.
 
 Acceptance Criteria
 

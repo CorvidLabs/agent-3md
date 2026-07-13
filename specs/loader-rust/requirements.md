@@ -10,21 +10,23 @@ spec: loader-rust.spec.md
 
 ### REQ-loader-rust-001
 
-The implementation SHALL satisfy this requirement.
+The Rust loader SHALL parse 3md documents into native Rust structures.
 
 Acceptance Criteria
 
 - Parse 3md structures using native Rust structures.
+
 ### REQ-loader-rust-002
 
-The implementation SHALL satisfy this requirement.
+The Rust loader SHALL implement the reference trigger-routing behavior.
 
 Acceptance Criteria
 
 - Implement matching trigger routing logic.
+
 ### REQ-loader-rust-003
 
-The implementation SHALL satisfy this requirement.
+The Rust loader SHALL mirror the reference validation rules exactly.
 
 Acceptance Criteria
 

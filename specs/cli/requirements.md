@@ -10,21 +10,23 @@ spec: cli.spec.md
 
 ### REQ-cli-001
 
-The implementation SHALL satisfy this requirement.
+The CLI SHALL provide `new`, `manifest`, `skills`, `route`, `get`, `resolve`, and `run` commands.
 
 Acceptance Criteria
 
 - Provide `new`, `manifest`, `skills`, `route`, `get`, `resolve`, and `run` commands.
+
 ### REQ-cli-002
 
-The implementation SHALL satisfy this requirement.
+The CLI SHALL resolve the default agent file relative to the loader script.
 
 Acceptance Criteria
 
 - Resolve default file relative to the loader script.
+
 ### REQ-cli-003
 
-The implementation SHALL satisfy this requirement.
+The CLI SHALL execute filled commands using child-process spawning.
 
 Acceptance Criteria
 
