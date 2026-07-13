@@ -1,6 +1,6 @@
 ---
 id: CHG-0001-adopt-trust-1-and-specsync-5
-state: implementing
+state: accepted
 type: migration
 base_commit: 849c1d9652b5304dc8874e0060120b8378a36c74
 ---

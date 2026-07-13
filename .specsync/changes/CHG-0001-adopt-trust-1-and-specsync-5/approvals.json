@@ -13,6 +13,20 @@
       "timestamp": 1783971300,
       "digest": "a946d9c6568428a1f378c45c3df773c7ec46054bddabf9fcb9e8d1cecccfb5ed",
       "note": "Definition re-approved after native migration verification and final non-semantic requirement corrections; hosted CI and closing acceptance remain pending."
+    },
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783971707,
+      "digest": "6c1fd3daf5afb7d47ed3101dc1339e0e172cf25abd193f904d6a36379921c52e",
+      "note": "Definition re-approved after the pushed preparation commit passed the hosted Trust and CodeQL checks; closing verification remains pending."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1783971724,
+      "digest": "3f5bb293b31d9b2b03db202e4736140c452b28a355540a00005095d7f6a017ec",
+      "note": "Accepted after the exact migration configuration passed local TypeScript, Rust, Swift, strict SpecSync, agent-integration, Trust-doctor verification and the hosted Trust and CodeQL checks."
     }
   ]
 }
