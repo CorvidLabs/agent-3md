@@ -1,0 +1,19 @@
+{
+  "approvals": [
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783991887,
+      "digest": "9190eec87a9de8bf8a5b1a13d311a217573bfeb78a354b78a99538199e33c25b",
+      "note": "Definition approved after diagnosing the exact hosted ordering failure and confirming the immutable setup remains migration-only."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1783991931,
+      "digest": "898b3b9e02852642fa956130ef8896fd503e585765141842832299a3c29738ce",
+      "note": "Closing approval recorded after the immutable hosted setup correction passed complete native verification."
+    }
+  ],
+  "reopenings": []
+}

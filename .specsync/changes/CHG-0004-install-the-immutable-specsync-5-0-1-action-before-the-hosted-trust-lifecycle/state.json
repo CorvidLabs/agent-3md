@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "CHG-0004-install-the-immutable-specsync-5-0-1-action-before-the-hosted-trust-lifecycle",
+  "slug": "install-the-immutable-specsync-5-0-1-action-before-the-hosted-trust-lifecycle",
+  "title": "Install the immutable SpecSync 5.0.1 action before the hosted Trust lifecycle",
+  "description": "Install the immutable SpecSync 5.0.1 action before the hosted Trust lifecycle",
+  "kind": "migration",
+  "state": "accepted",
+  "canonical_applied": true,
+  "base_commit": "ffe2ad05876665501b0c39560c2c4063396dc806",
+  "created_at": 1783991831,
+  "updated_at": 1783991931,
+  "affected_specs": [],
+  "affected_paths": [
+    ".github/workflows/trust.yml"
+  ],
+  "no_spec_change": true,
+  "no_spec_change_rationale": "This hosted-runner setup correction makes the approved strict governance lifecycle executable and does not change Agent 3MD runtime behavior or canonical contracts.",
+  "acceptance_criteria": [
+    "The hosted workflow pins the SpecSync 5.0.1 action to commit 59bbfa766c6cce01ab815ab47db195b0629cc014 before Trust",
+    "runs strict forced validation at 100 percent",
+    "exposes the binary to the Trust lifecycle",
+    "and exact-head hosted Trust passes without product changes"
+  ],
+  "selected_artifacts": [
+    "context",
+    "research",
+    "design",
+    "plan",
+    "tasks",
+    "testing",
+    "docs"
+  ],
+  "dependencies": [],
+  "answers": {
+    "architecture_risk": "yes",
+    "public_contract": "no"
+  }
+}
