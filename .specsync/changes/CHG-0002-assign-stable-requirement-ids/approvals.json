@@ -1,0 +1,18 @@
+{
+  "approvals": [
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783827253,
+      "digest": "0d1dcad56de25e4ff77f1e33ba059aa23feb7688d0164920a26fa488e95d7488",
+      "note": "Authorized by the user-approved CorvidLabs Trust 1 / SpecSync 5 rollout plan."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1783971332,
+      "digest": "28e1e41ed731a0ee708d6431f7b5da1cd27e53d08ba8b7ef423b446f974c4bba",
+      "note": "Accepted after reviewing all requirement companions for accurate, repository-specific normative behavior and completing the TypeScript, Rust, and Swift native verification lane."
+    }
+  ]
+}

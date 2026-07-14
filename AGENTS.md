@@ -25,14 +25,14 @@ CLI. Default to Bun for the TypeScript toolchain (`bun test`, `bun build`,
 validation, and dependency resolution must not diverge across languages.
 
 <!-- CorvidLabs trust toolchain: BEGIN (managed, do not edit inside) -->
-## CorvidLabs trust toolchain (standing rules)
+## CorvidLabs trust toolchain
 
-This repo is governed by four CLIs. Every session MUST use them; never bypass or weaken them.
+This repository uses one trust gate. Every session must use it and must not bypass or weaken it.
 
-- fledge: run `fledge lanes run verify` before calling any change done. It must pass.
-- spec-sync: when you change a module with a *.spec.md, update the spec, then `fledge spec check`. (skipped: <reason>, if content-only)
-- augur: `augur check --staged` before a commit; `augur check --range origin/main..HEAD` before merge. A block verdict is a hard stop, never auto-overridden.
-- attest: after a green lane, `attest sign --commit HEAD --reviewer agent:<id> --from-augur augur.json --tests-passed`.
+- Run `fledge trust verify` before calling a change complete.
+- Keep module specs synchronized with implementation changes.
+- Treat an Augur block verdict as a hard stop that must be surfaced and de-risked.
+- Record and verify provenance with Attest after the repository's verification lane passes.
+- Keep generated trust configuration and this managed block in place.
 
-CI enforces the same gate (.github/workflows/trust.yml) and fails if this block is missing. Brand rule: no em-dash characters in anything you write.
 <!-- CorvidLabs trust toolchain: END -->

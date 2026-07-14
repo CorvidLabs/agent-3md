@@ -8,7 +8,20 @@ spec: package.spec.md
 
 ## Acceptance Criteria
 
+### REQ-package-001
+
+The package SHALL export `Agent`, `fillCommand`, and `commandPlaceholders`.
+
+Acceptance Criteria
+
 - Export `Agent`, `fillCommand`, `commandPlaceholders`.
+
+### REQ-package-002
+
+The package SHALL export `routeQuery` from `index-query.ts`.
+
+Acceptance Criteria
+
 - Export `routeQuery` from `index-query.ts`.
 
 ## Constraints

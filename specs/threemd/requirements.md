@@ -8,8 +8,28 @@ spec: threemd.spec.md
 
 ## Acceptance Criteria
 
+### REQ-threemd-001
+
+The parser SHALL split 3md documents on Markdown horizontal rules.
+
+Acceptance Criteria
+
 - Split documents on horizontal rules (`---`).
+
+### REQ-threemd-002
+
+The parser SHALL extract key-value frontmatter attributes.
+
+Acceptance Criteria
+
 - Extract key-value frontmatter attributes.
+
+### REQ-threemd-003
+
+The parser SHALL extract `kind`, `z`, `label`, and other attributes from plane headers.
+
+Acceptance Criteria
+
 - Parse plane headers to extract attributes like `kind`, `z`, and `label`.
 
 ## Constraints

@@ -1,0 +1,157 @@
+{
+  "approvals": [
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783826959,
+      "digest": "9ab781c89737623a87bdc0bd127b2899d04e3138bf1acc9dfb2a4ded9df60e78",
+      "note": "Authorized by the user-approved CorvidLabs Trust 1 / SpecSync 5 rollout plan."
+    },
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783971300,
+      "digest": "a946d9c6568428a1f378c45c3df773c7ec46054bddabf9fcb9e8d1cecccfb5ed",
+      "note": "Definition re-approved after native migration verification and final non-semantic requirement corrections; hosted CI and closing acceptance remain pending."
+    },
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783971707,
+      "digest": "6c1fd3daf5afb7d47ed3101dc1339e0e172cf25abd193f904d6a36379921c52e",
+      "note": "Definition re-approved after the pushed preparation commit passed the hosted Trust and CodeQL checks; closing verification remains pending."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1783971724,
+      "digest": "3f5bb293b31d9b2b03db202e4736140c452b28a355540a00005095d7f6a017ec",
+      "note": "Accepted after the exact migration configuration passed local TypeScript, Rust, Swift, strict SpecSync, agent-integration, Trust-doctor verification and the hosted Trust and CodeQL checks."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1783991593,
+      "digest": "c2d6b0ccb3a7d7465f96546e49b264ff20095c86b29b8f58890a4b7c4ec4ecf3",
+      "note": "Fresh closing approval after the review corrections passed the complete native TypeScript, typed-build, Rust, and Swift verification lane."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1783991920,
+      "digest": "da7fa04d830edaf25c6fbbf1987ea5a7d18d2e7fedd2a624b09d69743a1247d4",
+      "note": "Fresh closing approval after the immutable hosted SpecSync setup correction passed the complete native verification lane."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1783992656,
+      "digest": "b5bfafeb5d6ec29e8ca707f5f91a6f767aec1918b4c7fac849e34c0d7ac49f72",
+      "note": "Fresh closing approval after checksum-pinned pre-Trust Fledge setup and complete isolated native verification passed."
+    }
+  ],
+  "reopenings": [
+    {
+      "schema_version": 1,
+      "change_id": "CHG-0001-adopt-trust-1-and-specsync-5",
+      "actor": "user:0xLeif",
+      "reason": "The accepted migration delivery inputs changed only to restore strict SpecSync enforcement and narrow broad governance ignores after review; fresh native verification and closing approval are required.",
+      "timestamp": 1783991457,
+      "from_state": "accepted",
+      "to_state": "verifying",
+      "superseded_approval": {
+        "gate": "acceptance",
+        "actor": "user:0xLeif",
+        "timestamp": 1783971724,
+        "digest": "3f5bb293b31d9b2b03db202e4736140c452b28a355540a00005095d7f6a017ec",
+        "note": "Accepted after the exact migration configuration passed local TypeScript, Rust, Swift, strict SpecSync, agent-integration, Trust-doctor verification and the hosted Trust and CodeQL checks."
+      },
+      "prior_verification": {
+        "timestamp": 1783971718,
+        "commit": "fa3b9c7e7b571d0b2b81920b79e8d904d53bf8f1",
+        "contract_digest": "6c1fd3daf5afb7d47ed3101dc1339e0e172cf25abd193f904d6a36379921c52e",
+        "workspace_digest": "211bbdd4d45551b193aac294d7c59ba41f9a848bb8d6e0d06d0ecda22c295977",
+        "acceptance_input_digest": "b66c0bbeb31516617bbcd37375df3528ce80199c7bb67d210b7b84fb690e13e1",
+        "passed": true,
+        "commands": [
+          {
+            "command": "fledge lanes run verify",
+            "success": true,
+            "exit_code": 0
+          }
+        ],
+        "requirement_ids": []
+      },
+      "stale_acceptance_input_digest": "b66c0bbeb31516617bbcd37375df3528ce80199c7bb67d210b7b84fb690e13e1",
+      "current_acceptance_input_digest": "6a4b3456df6e49387a8e787689f893fa9ce6ee0041b064838af98629486efcd2"
+    },
+    {
+      "schema_version": 1,
+      "change_id": "CHG-0001-adopt-trust-1-and-specsync-5",
+      "actor": "user:0xLeif",
+      "reason": "The hosted Trust workflow now installs the immutable SpecSync 5.0.1 binary before lifecycle execution to preserve strict enforcement; fresh migration verification and closing approval are required.",
+      "timestamp": 1783991888,
+      "from_state": "accepted",
+      "to_state": "verifying",
+      "superseded_approval": {
+        "gate": "acceptance",
+        "actor": "user:0xLeif",
+        "timestamp": 1783991593,
+        "digest": "c2d6b0ccb3a7d7465f96546e49b264ff20095c86b29b8f58890a4b7c4ec4ecf3",
+        "note": "Fresh closing approval after the review corrections passed the complete native TypeScript, typed-build, Rust, and Swift verification lane."
+      },
+      "prior_verification": {
+        "timestamp": 1783991569,
+        "commit": "011bb1cf6ba662f3b2b723b6d866e004e4f7a3b9",
+        "contract_digest": "6c1fd3daf5afb7d47ed3101dc1339e0e172cf25abd193f904d6a36379921c52e",
+        "workspace_digest": "93f0e6d8a9cf515a1c4791696afcdd20b1048fd91d927225928cad50e9fe31d9",
+        "acceptance_input_digest": "423861ea154a69fe4896e21d849b095bfa8f678901f447c0c708c397f2006b07",
+        "passed": true,
+        "commands": [
+          {
+            "command": "fledge lanes run verify",
+            "success": true,
+            "exit_code": 0
+          }
+        ],
+        "requirement_ids": []
+      },
+      "stale_acceptance_input_digest": "423861ea154a69fe4896e21d849b095bfa8f678901f447c0c708c397f2006b07",
+      "current_acceptance_input_digest": "7055991a20ab8ecc7aa79e56cb704095c17f2eb5f9264b5330399b0372a0531f"
+    },
+    {
+      "schema_version": 1,
+      "change_id": "CHG-0001-adopt-trust-1-and-specsync-5",
+      "actor": "user:0xLeif",
+      "reason": "The hosted workflow now installs checksum-verified Fledge 1.7.0 before strict SpecSync executes the native verification command; fresh migration evidence is required.",
+      "timestamp": 1783992205,
+      "from_state": "accepted",
+      "to_state": "verifying",
+      "superseded_approval": {
+        "gate": "acceptance",
+        "actor": "user:0xLeif",
+        "timestamp": 1783991920,
+        "digest": "da7fa04d830edaf25c6fbbf1987ea5a7d18d2e7fedd2a624b09d69743a1247d4",
+        "note": "Fresh closing approval after the immutable hosted SpecSync setup correction passed the complete native verification lane."
+      },
+      "prior_verification": {
+        "timestamp": 1783991900,
+        "commit": "ffe2ad05876665501b0c39560c2c4063396dc806",
+        "contract_digest": "6c1fd3daf5afb7d47ed3101dc1339e0e172cf25abd193f904d6a36379921c52e",
+        "workspace_digest": "ddc15116e6754d8f22055648a05f2e6a3d613a6c400854780a688288908d7473",
+        "acceptance_input_digest": "7055991a20ab8ecc7aa79e56cb704095c17f2eb5f9264b5330399b0372a0531f",
+        "passed": true,
+        "commands": [
+          {
+            "command": "fledge lanes run verify",
+            "success": true,
+            "exit_code": 0
+          }
+        ],
+        "requirement_ids": []
+      },
+      "stale_acceptance_input_digest": "7055991a20ab8ecc7aa79e56cb704095c17f2eb5f9264b5330399b0372a0531f",
+      "current_acceptance_input_digest": "bd5d42900604fac2619324ebe4437175094be9ff2df694be74c933d7bdf27059"
+    }
+  ]
+}

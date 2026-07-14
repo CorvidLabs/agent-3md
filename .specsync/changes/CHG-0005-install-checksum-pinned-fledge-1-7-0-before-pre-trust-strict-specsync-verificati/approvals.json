@@ -1,0 +1,19 @@
+{
+  "approvals": [
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783992205,
+      "digest": "024e95b13f3ae231f5c3f5ddc23721109d2ecadb0338592a7386a3e57b7a999e",
+      "note": "Definition approved after matching the exact immutable Trust Fledge asset and checksum."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1783992688,
+      "digest": "02210ecabda0c6df3836d97e1186143b906860ed34adb3c8e6eeb2e7968bb48d",
+      "note": "Closing approval recorded after checksum-pinned Fledge setup and complete isolated native verification passed."
+    }
+  ],
+  "reopenings": []
+}

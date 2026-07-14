@@ -8,8 +8,28 @@ spec: export.spec.md
 
 ## Acceptance Criteria
 
+### REQ-export-001
+
+The exporter SHALL output a valid JSON representation of `AgentManifest`.
+
+Acceptance Criteria
+
 - Output valid JSON representation of `AgentManifest`.
+
+### REQ-export-002
+
+The exported manifest SHALL include skill triggers, tools, costs, and inputs.
+
+Acceptance Criteria
+
 - Include skill metadata (triggers, tools, costs, inputs).
+
+### REQ-export-003
+
+The exporter SHALL include skill bodies only when requested by the CLI flag.
+
+Acceptance Criteria
+
 - Conditionally include bodies based on CLI flag.
 
 ## Constraints

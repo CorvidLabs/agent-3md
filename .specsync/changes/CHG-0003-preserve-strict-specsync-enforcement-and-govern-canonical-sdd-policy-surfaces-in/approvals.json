@@ -1,0 +1,33 @@
+{
+  "approvals": [
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783991442,
+      "digest": "ff41236314380b0bec337c247e719ef140288facbb70f70bced3937b1870ccad",
+      "note": "Definition approved for migration-only enforcement corrections after confirming no product or canonical behavior changes."
+    },
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783991603,
+      "digest": "4a1c8c337e35b8d05f7163d26fb72ded75f851cfc51797fbe54f3065e2b721a7",
+      "note": "Definition re-approved after refining the non-circular native verification and strict Trust lifecycle lane design."
+    },
+    {
+      "gate": "definition",
+      "actor": "user:0xLeif",
+      "timestamp": 1783991628,
+      "digest": "f5377b0cdf420fda0ee2dfc967b04b79103a2014e36c0a509163187959a73184",
+      "note": "Definition re-approved after truthfully recording completed implementation and verification preparation tasks."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1783991639,
+      "digest": "13948f2854734ab577c159a5e83b0e58ae15a8915f870916ac341b7e8616c6f1",
+      "note": "Closing approval recorded after strict-governance preparation and complete native TypeScript, typed-build, Rust, and Swift verification passed."
+    }
+  ],
+  "reopenings": []
+}
