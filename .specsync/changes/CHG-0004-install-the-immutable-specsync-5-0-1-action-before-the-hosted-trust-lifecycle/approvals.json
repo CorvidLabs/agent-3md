@@ -13,7 +13,49 @@
       "timestamp": 1783991931,
       "digest": "898b3b9e02852642fa956130ef8896fd503e585765141842832299a3c29738ce",
       "note": "Closing approval recorded after the immutable hosted setup correction passed complete native verification."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1783992675,
+      "digest": "97c808e1936bd94e674f5a696eab22356f73ad4c879b7fc1762ba36dad6b0bf3",
+      "note": "Fresh closing approval after checksum-pinned Fledge setup and complete isolated native verification passed."
     }
   ],
-  "reopenings": []
+  "reopenings": [
+    {
+      "schema_version": 1,
+      "change_id": "CHG-0004-install-the-immutable-specsync-5-0-1-action-before-the-hosted-trust-lifecycle",
+      "actor": "user:0xLeif",
+      "reason": "The immutable SpecSync setup now receives its required checksum-pinned Fledge dependency before executing accepted verification; fresh closing evidence is required.",
+      "timestamp": 1783992205,
+      "from_state": "accepted",
+      "to_state": "verifying",
+      "superseded_approval": {
+        "gate": "acceptance",
+        "actor": "user:0xLeif",
+        "timestamp": 1783991931,
+        "digest": "898b3b9e02852642fa956130ef8896fd503e585765141842832299a3c29738ce",
+        "note": "Closing approval recorded after the immutable hosted setup correction passed complete native verification."
+      },
+      "prior_verification": {
+        "timestamp": 1783991922,
+        "commit": "ffe2ad05876665501b0c39560c2c4063396dc806",
+        "contract_digest": "9190eec87a9de8bf8a5b1a13d311a217573bfeb78a354b78a99538199e33c25b",
+        "workspace_digest": "ddc15116e6754d8f22055648a05f2e6a3d613a6c400854780a688288908d7473",
+        "acceptance_input_digest": "96e296129b5897348b7800b37eb37033711288abde1086567a5a928cce4514c7",
+        "passed": true,
+        "commands": [
+          {
+            "command": "fledge lanes run verify",
+            "success": true,
+            "exit_code": 0
+          }
+        ],
+        "requirement_ids": []
+      },
+      "stale_acceptance_input_digest": "96e296129b5897348b7800b37eb37033711288abde1086567a5a928cce4514c7",
+      "current_acceptance_input_digest": "08c06b60237d24206999a07110c70926723a59259915512639927de79afe011b"
+    }
+  ]
 }

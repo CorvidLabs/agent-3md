@@ -38,6 +38,24 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Install Fledge for pre-Trust verification
+        env:
+          FLEDGE_SHA256: 21d0916d52ef14e6d33e3967417773369e047a0311e66bbb1eecc8f69332a040
+        run: |
+          set -euo pipefail
+          install_dir="${RUNNER_TEMP}/pretrust-fledge"
+          mkdir -p "${install_dir}"
+          curl -fsSL \
+            "https://github.com/CorvidLabs/fledge/releases/download/v1.7.0/fledge-macos-aarch64" \
+            -o "${install_dir}/fledge"
+          actual="$(shasum -a 256 "${install_dir}/fledge" | awk '{print $1}')"
+          if [ "${actual}" != "${FLEDGE_SHA256}" ]; then
+            echo "::error::Fledge 1.7.0 checksum mismatch"
+            exit 1
+          fi
+          chmod +x "${install_dir}/fledge"
+          echo "${install_dir}" >> "${GITHUB_PATH}"
+
       # Preserve the former strict SpecSync gate and put its verified binary on
       # PATH before Trust invokes the repository lifecycle lane.
       - name: Strict SpecSync gate
