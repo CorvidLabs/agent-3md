@@ -27,6 +27,49 @@
       "timestamp": 1783971724,
       "digest": "3f5bb293b31d9b2b03db202e4736140c452b28a355540a00005095d7f6a017ec",
       "note": "Accepted after the exact migration configuration passed local TypeScript, Rust, Swift, strict SpecSync, agent-integration, Trust-doctor verification and the hosted Trust and CodeQL checks."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1783991593,
+      "digest": "c2d6b0ccb3a7d7465f96546e49b264ff20095c86b29b8f58890a4b7c4ec4ecf3",
+      "note": "Fresh closing approval after the review corrections passed the complete native TypeScript, typed-build, Rust, and Swift verification lane."
+    }
+  ],
+  "reopenings": [
+    {
+      "schema_version": 1,
+      "change_id": "CHG-0001-adopt-trust-1-and-specsync-5",
+      "actor": "user:0xLeif",
+      "reason": "The accepted migration delivery inputs changed only to restore strict SpecSync enforcement and narrow broad governance ignores after review; fresh native verification and closing approval are required.",
+      "timestamp": 1783991457,
+      "from_state": "accepted",
+      "to_state": "verifying",
+      "superseded_approval": {
+        "gate": "acceptance",
+        "actor": "user:0xLeif",
+        "timestamp": 1783971724,
+        "digest": "3f5bb293b31d9b2b03db202e4736140c452b28a355540a00005095d7f6a017ec",
+        "note": "Accepted after the exact migration configuration passed local TypeScript, Rust, Swift, strict SpecSync, agent-integration, Trust-doctor verification and the hosted Trust and CodeQL checks."
+      },
+      "prior_verification": {
+        "timestamp": 1783971718,
+        "commit": "fa3b9c7e7b571d0b2b81920b79e8d904d53bf8f1",
+        "contract_digest": "6c1fd3daf5afb7d47ed3101dc1339e0e172cf25abd193f904d6a36379921c52e",
+        "workspace_digest": "211bbdd4d45551b193aac294d7c59ba41f9a848bb8d6e0d06d0ecda22c295977",
+        "acceptance_input_digest": "b66c0bbeb31516617bbcd37375df3528ce80199c7bb67d210b7b84fb690e13e1",
+        "passed": true,
+        "commands": [
+          {
+            "command": "fledge lanes run verify",
+            "success": true,
+            "exit_code": 0
+          }
+        ],
+        "requirement_ids": []
+      },
+      "stale_acceptance_input_digest": "b66c0bbeb31516617bbcd37375df3528ce80199c7bb67d210b7b84fb690e13e1",
+      "current_acceptance_input_digest": "6a4b3456df6e49387a8e787689f893fa9ce6ee0041b064838af98629486efcd2"
     }
   ]
 }

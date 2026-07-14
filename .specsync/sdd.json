@@ -42,8 +42,9 @@
     ".gemini/"
   ],
   "ignored_paths": [
-    ".specsync/",
-    "specs/"
+    ".specsync/changes/",
+    ".specsync/change.lock",
+    ".specsync/hashes.json"
   ],
   "verification_commands": [
     "fledge lanes run verify"

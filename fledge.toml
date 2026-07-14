@@ -13,6 +13,10 @@ build = "bun run build"
 # Guard the shipped types: the build must produce dist/index.d.ts.
 types = "test -f dist/index.d.ts"
 
+# Preserve the previous workflow's strict contract gate. Trust's standard
+# profile keeps provenance progressive, so strict SpecSync runs in lifecycle.
+specsync = "specsync check --strict --force --require-coverage 100"
+
 [tasks.rust]
 cmd = "cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test"
 dir = "loaders/rust"
@@ -24,8 +28,12 @@ dir = "loaders/swift"
 description = "Swift loader tests run on the canonical ThreeMD package (proves the format ports)."
 
 [lanes.verify]
-description = "Native verification for the TypeScript reference (test + typed build) and the Rust and Swift loaders. Trust runs SpecSync after this lane."
+description = "Native verification for the TypeScript reference and the Rust and Swift loaders."
 steps = ["test", "build", "types", "rust", "swift"]
+
+[lanes.trust]
+description = "Strict SpecSync followed by the complete native verification pipeline."
+steps = ["specsync", "test", "build", "types", "rust", "swift"]
 
 [lanes.ci]
 description = "Alias for the native verify lane."
