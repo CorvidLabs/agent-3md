@@ -13,7 +13,49 @@
       "timestamp": 1783992688,
       "digest": "02210ecabda0c6df3836d97e1186143b906860ed34adb3c8e6eeb2e7968bb48d",
       "note": "Closing approval recorded after checksum-pinned Fledge setup and complete isolated native verification passed."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1784415777,
+      "digest": "32b7b2246f7f2ba19a3e3a0b3cff25038c5f8f5486df69b3608efaf256809b32",
+      "note": "Re-acceptance with the Trust 1.1.1 and SpecSync 5.1.1 pins; canonical deltas were already integrated and were not replayed."
     }
   ],
-  "reopenings": []
+  "reopenings": [
+    {
+      "schema_version": 1,
+      "change_id": "CHG-0005-install-checksum-pinned-fledge-1-7-0-before-pre-trust-strict-specsync-verificati",
+      "actor": "user:0xLeif",
+      "reason": "Trust 1.1.1 and SpecSync 5.1.1 pins changed governed delivery inputs; accepted verification is stale.",
+      "timestamp": 1784415712,
+      "from_state": "accepted",
+      "to_state": "verifying",
+      "superseded_approval": {
+        "gate": "acceptance",
+        "actor": "user:0xLeif",
+        "timestamp": 1783992688,
+        "digest": "02210ecabda0c6df3836d97e1186143b906860ed34adb3c8e6eeb2e7968bb48d",
+        "note": "Closing approval recorded after checksum-pinned Fledge setup and complete isolated native verification passed."
+      },
+      "prior_verification": {
+        "timestamp": 1783992677,
+        "commit": "d117474faec9d8e916c57f118d841c6adc6f9765",
+        "contract_digest": "024e95b13f3ae231f5c3f5ddc23721109d2ecadb0338592a7386a3e57b7a999e",
+        "workspace_digest": "8af7e20a0332d7e0dddb2b4c043cd001d39ae1fe275a97a0d475ae9d70dbd5b2",
+        "acceptance_input_digest": "08c06b60237d24206999a07110c70926723a59259915512639927de79afe011b",
+        "passed": true,
+        "commands": [
+          {
+            "command": "fledge lanes run verify",
+            "success": true,
+            "exit_code": 0
+          }
+        ],
+        "requirement_ids": []
+      },
+      "stale_acceptance_input_digest": "08c06b60237d24206999a07110c70926723a59259915512639927de79afe011b",
+      "current_acceptance_input_digest": "26f2102b98aea173acaab83ec15b6bb7d9c6e6e63e2ff8aa5a81f132e4e7dd66"
+    }
+  ]
 }
