@@ -9,7 +9,7 @@
   "canonical_applied": true,
   "base_commit": "ffe2ad05876665501b0c39560c2c4063396dc806",
   "created_at": 1783991831,
-  "updated_at": 1783992675,
+  "updated_at": 1784415732,
   "affected_specs": [],
   "affected_paths": [
     ".github/workflows/trust.yml"

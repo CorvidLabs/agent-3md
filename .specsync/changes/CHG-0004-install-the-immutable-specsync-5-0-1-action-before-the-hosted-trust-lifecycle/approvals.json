@@ -20,6 +20,13 @@
       "timestamp": 1783992675,
       "digest": "97c808e1936bd94e674f5a696eab22356f73ad4c879b7fc1762ba36dad6b0bf3",
       "note": "Fresh closing approval after checksum-pinned Fledge setup and complete isolated native verification passed."
+    },
+    {
+      "gate": "acceptance",
+      "actor": "user:0xLeif",
+      "timestamp": 1784415732,
+      "digest": "1ba1448da45574a5ade9b185ffb142be9a2e46cfae549a4a975045705af2691d",
+      "note": "Re-acceptance with the Trust 1.1.1 and SpecSync 5.1.1 pins; canonical deltas were already integrated and were not replayed."
     }
   ],
   "reopenings": [
@@ -56,6 +63,40 @@
       },
       "stale_acceptance_input_digest": "96e296129b5897348b7800b37eb37033711288abde1086567a5a928cce4514c7",
       "current_acceptance_input_digest": "08c06b60237d24206999a07110c70926723a59259915512639927de79afe011b"
+    },
+    {
+      "schema_version": 1,
+      "change_id": "CHG-0004-install-the-immutable-specsync-5-0-1-action-before-the-hosted-trust-lifecycle",
+      "actor": "user:0xLeif",
+      "reason": "Trust 1.1.1 and SpecSync 5.1.1 pins changed governed delivery inputs; accepted verification is stale.",
+      "timestamp": 1784415664,
+      "from_state": "accepted",
+      "to_state": "verifying",
+      "superseded_approval": {
+        "gate": "acceptance",
+        "actor": "user:0xLeif",
+        "timestamp": 1783992675,
+        "digest": "97c808e1936bd94e674f5a696eab22356f73ad4c879b7fc1762ba36dad6b0bf3",
+        "note": "Fresh closing approval after checksum-pinned Fledge setup and complete isolated native verification passed."
+      },
+      "prior_verification": {
+        "timestamp": 1783992658,
+        "commit": "d117474faec9d8e916c57f118d841c6adc6f9765",
+        "contract_digest": "9190eec87a9de8bf8a5b1a13d311a217573bfeb78a354b78a99538199e33c25b",
+        "workspace_digest": "8af7e20a0332d7e0dddb2b4c043cd001d39ae1fe275a97a0d475ae9d70dbd5b2",
+        "acceptance_input_digest": "08c06b60237d24206999a07110c70926723a59259915512639927de79afe011b",
+        "passed": true,
+        "commands": [
+          {
+            "command": "fledge lanes run verify",
+            "success": true,
+            "exit_code": 0
+          }
+        ],
+        "requirement_ids": []
+      },
+      "stale_acceptance_input_digest": "08c06b60237d24206999a07110c70926723a59259915512639927de79afe011b",
+      "current_acceptance_input_digest": "26f2102b98aea173acaab83ec15b6bb7d9c6e6e63e2ff8aa5a81f132e4e7dd66"
     }
   ]
 }
