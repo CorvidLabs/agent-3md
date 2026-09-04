@@ -1,6 +1,6 @@
 ---
 id: CHG-0004-install-the-immutable-specsync-5-0-1-action-before-the-hosted-trust-lifecycle
-state: accepted
+state: archived
 type: migration
 base_commit: ffe2ad05876665501b0c39560c2c4063396dc806
 ---
