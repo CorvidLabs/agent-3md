@@ -1,7 +1,7 @@
 ---
 module: validation
 version: 1
-status: draft
+status: active
 files:
   - src/validate.ts
 
@@ -31,7 +31,7 @@ that prints a report and exits non-zero when any error is found.
 | `validateAgent` | `validateAgent(src: string): Report`: parse and check 3md source against agent3md/1, returning a report of errors and warnings. |
 | `formatReport` | `formatReport(file: string, r: Report): string`: render a `Report` as a human-readable, multi-line block with a `PASS` / `FAIL` summary. |
 
-### Structs & Enums
+### Exported Types
 
 | Type | Description |
 |------|-------------|

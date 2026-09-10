@@ -1,7 +1,7 @@
 ---
 module: loader-swift
 version: 1
-status: draft
+status: active
 files:
   - loaders/swift/Sources/Agent3MD/Agent3MD.swift
   - loaders/swift/Sources/Agent3MDCLI/main.swift
@@ -36,14 +36,34 @@ manifest, and the tests.
 | `fillCommand` | `fillCommand(_ template: String, _ values: [String: String]) -> String`: fill `{name}` placeholders (shell-quoted), leaving unprovided ones visible. |
 | `depLinks` | `depLinks(in body: String) -> [Int]`: extract `[[z=N]]` / `[[z=N\|label]]` integer targets. |
 | `tokenize` | `tokenize(_ s: String) -> [String]`: lowercased runs of Unicode letters / digits. |
+| `init` | `Agent.init(source: String) throws`: parse the source through `ThreeMD.Parser`, pick the identity plane, and index every other plane as a skill by name and z. |
+| `get` | `Agent.get(_ name: String) -> Skill?` / `Agent.get(z: Int) -> Skill?`: O(1) fetch of one skill by name or z. |
+| `route` | `Agent.route(_ text: String) -> [(skill: Skill, score: Int, hits: [String])]`: rank skills by matched trigger phrases, ties broken by lower z. |
+| `resolve` | `Agent.resolve(_ name: String) -> [Skill]`: a skill plus its transitive `[[z=N]]` dependencies, in load order. |
+| `command` | `Agent.command(_ name: String, _ values: [String: String]) -> String?` / `Agent.command(z: Int, _ values: [String: String]) -> String?`: the skill's `tool` filled from values, or nil when it has no tool. |
 
-### Structs & Enums
+### Exported Types
 
-| Type | Description |
-|------|-------------|
+| Export | Description |
+|--------|-------------|
 | `Agent` | A `Sendable` value type: `name`, `model`, `tools`, `identity`, `skills`, with route / get / resolve / command over its skills. |
 | `Skill` | A `Sendable` skill: `z`, `name`, `triggers`, `inputs`, `inputSchema`, `tool`, `cost`, `deps`, `body`. |
 | `SkillInput` | A `Sendable` typed input: `name`, `type`, `required`. |
+| `name` | `SkillInput.name` / `Skill.name` / `Agent.name`: the input's name, the skill's name (`skill-<z>` when the plane has no label), and the agent's name. |
+| `type` | `SkillInput.type`: the declared input type (`string`, `number`, `boolean`, `object`, or `array`). |
+| `required` | `SkillInput.required`: whether the input must be supplied; a bare input name is required. |
+| `z` | `Skill.z`: the skill plane's z index. |
+| `triggers` | `Skill.triggers`: the trigger phrases `route` matches a request against. |
+| `inputs` | `Skill.inputs`: the input names, derived from `inputSchema` so the two never disagree. |
+| `inputSchema` | `Skill.inputSchema`: the typed inputs parsed from the plane's `inputs` attribute. |
+| `tool` | `Skill.tool`: the command template, nil unless the plane sets a non-empty `tool`. |
+| `cost` | `Skill.cost`: the plane's cost hint, nil when unset. |
+| `deps` | `Skill.deps`: the `[[z=N]]` dependency targets found in the body, in body order. |
+| `body` | `Skill.body`: the plane's full body text, fetched on demand. |
+| `model` | `Agent.model`: the identity plane's model, `"unknown"` when unset. |
+| `tools` | `Agent.tools`: the tool names from the identity plane's `tools` metadata. |
+| `identity` | `Agent.identity`: the identity plane as a `Skill`, nil when the document has no plane. |
+| `skills` | `Agent.skills`: every non-identity plane, in load order. |
 
 ### Traits
 
