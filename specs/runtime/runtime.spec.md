@@ -1,7 +1,7 @@
 ---
 module: runtime
 version: 3
-status: draft
+status: active
 files:
   - src/runtime.ts
 
@@ -29,7 +29,7 @@ whole file into context.
 | `fillCommand` | `fillCommand(template, values)`: fill a `{name}` command template from values, shell-quoting them; unprovided placeholders stay visible. |
 | `commandPlaceholders` | `commandPlaceholders(template)`: the placeholder names a command template references, de-duplicated. |
 
-### Structs & Enums
+### Exported Types
 
 | Type | Description |
 |------|-------------|
