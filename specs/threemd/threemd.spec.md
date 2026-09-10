@@ -1,7 +1,7 @@
 ---
 module: threemd
 version: 1
-status: draft
+status: active
 files:
   - src/threemd.ts
 
@@ -32,7 +32,7 @@ loaders) consumes the `Document` this module produces rather than re-parsing 3md
 | `links` | `links(document: Document): CrossPlaneLink[]`: extract every `[[z=N]]` / `[[z=N\|text]]` cross-plane link from the document's plane bodies, in document order. |
 | `serialize` | `serialize(document: Document): string`: render a `Document` back into 3md source text. |
 
-### Structs & Enums
+### Exported Types
 
 | Type | Description |
 |------|-------------|

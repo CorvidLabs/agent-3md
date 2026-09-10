@@ -1,7 +1,7 @@
 ---
 module: package
 version: 1
-status: draft
+status: active
 files:
   - src/index.ts
   - src/index-query.ts
@@ -30,17 +30,25 @@ keeping per-turn context independent of how many skills the agent has.
 | Export | Description |
 |--------|-------------|
 | `routeQuery` | `routeQuery(agent: Agent, text: string): string[]`: the names of the skills matching `text`, ranked, with everything else about the match dropped. |
-| `Agent`, `fillCommand`, `commandPlaceholders` | Re-exported from `./runtime` (the reference loader and its command-template helpers). |
-| `validateAgent`, `formatReport` | Re-exported from `./validate` (the agent3md/1 validator). |
+| `Agent` | Re-exported from `./runtime` (the reference loader). |
+| `fillCommand` | Re-exported from `./runtime` (fill a `{name}` command template from values). |
+| `commandPlaceholders` | Re-exported from `./runtime` (the placeholder names a command template references). |
+| `validateAgent` | Re-exported from `./validate` (validate a source string against agent3md/1). |
+| `formatReport` | Re-exported from `./validate` (render a validation report as text). |
 | `parse` | Re-exported from `./threemd` (the canonical 3md parser). |
 
-### Structs & Enums
+### Exported Types
 
 | Type | Description |
 |------|-------------|
-| `Skill`, `SkillInput`, `AgentManifest` | Runtime types, re-exported. |
-| `Report`, `Issue`, `IssueLevel` | Validator types, re-exported. |
-| `Document`, `Plane` | 3md document types, re-exported. |
+| `Skill` | Runtime type, re-exported: one skill plane. |
+| `SkillInput` | Runtime type, re-exported: a typed skill input. |
+| `AgentManifest` | Runtime type, re-exported: the agent identity plus its skill catalog. |
+| `Report` | Validator type, re-exported: the result of `validateAgent`. |
+| `Issue` | Validator type, re-exported: one validation finding. |
+| `IssueLevel` | Validator type, re-exported: the severity of an `Issue`. |
+| `Document` | 3md document type, re-exported. |
+| `Plane` | 3md document type, re-exported. |
 
 ### Traits
 
