@@ -1,6 +1,6 @@
 ---
 id: CHG-0005-install-checksum-pinned-fledge-1-7-0-before-pre-trust-strict-specsync-verificati
-state: accepted
+state: archived
 type: migration
 base_commit: d117474faec9d8e916c57f118d841c6adc6f9765
 ---
