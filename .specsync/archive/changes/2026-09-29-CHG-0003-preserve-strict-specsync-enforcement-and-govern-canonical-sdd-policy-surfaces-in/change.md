@@ -1,6 +1,6 @@
 ---
 id: CHG-0003-preserve-strict-specsync-enforcement-and-govern-canonical-sdd-policy-surfaces-in
-state: accepted
+state: archived
 type: migration
 base_commit: 011bb1cf6ba662f3b2b723b6d866e004e4f7a3b9
 ---
