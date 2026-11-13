@@ -46,6 +46,11 @@
     ".specsync/change.lock",
     ".specsync/hashes.json"
   ],
+  "verification_ignored_paths": [
+    ".chough/sessions/",
+    ".chough/archive/",
+    ".chough/bugs/"
+  ],
   "verification_commands": [
     "fledge lanes run verify"
   ],
