@@ -6,10 +6,10 @@
   "title": "List Chough 0.6.0 record folders in verification_ignored_paths",
   "description": "List Chough 0.6.0 record folders in verification_ignored_paths",
   "kind": "operations",
-  "state": "draft",
+  "state": "approved",
   "base_commit": "6ed266175e4cc3abaf51500831c13b7343e58ae3",
   "created_at": 1794581116,
-  "updated_at": 1794581116,
+  "updated_at": 1794581120,
   "affected_specs": [],
   "affected_paths": [
     ".specsync/sdd.json"
